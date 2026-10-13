@@ -15,13 +15,18 @@ export default function AppLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: 'Inicio', headerShown: false }} />
-      <Stack.Screen name="simulacion" options={{ title: 'Simulación' }} />
+      <Stack.Screen name="simulacion/index" options={{ title: 'Simulaciones' }} />
+      <Stack.Screen name="simulacion/[id]" options={{ title: 'Simulación' }} />
+      <Stack.Screen name="resultado/[id]" options={{ title: 'Resultado' }} />
       <Stack.Screen name="progreso" options={{ title: 'Mi progreso' }} />
       <Stack.Screen name="historial" options={{ title: 'Historial' }} />
       <Stack.Screen name="perfil" options={{ title: 'Mi perfil' }} />
       <Stack.Protected guard={esAdmin}>
         <Stack.Screen name="admin/usuarios/index" options={{ title: 'Usuarios' }} />
         <Stack.Screen name="admin/usuarios/[id]" options={{ title: 'Usuario' }} />
+        <Stack.Screen name="admin/escenarios/index" options={{ title: 'Escenarios' }} />
+        <Stack.Screen name="admin/escenarios/[id]" options={{ title: 'Escenario' }} />
+        <Stack.Screen name="admin/escenarios/editor" options={{ title: 'Editor de escenario' }} />
       </Stack.Protected>
     </Stack>
   );

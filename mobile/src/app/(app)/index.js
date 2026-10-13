@@ -47,7 +47,7 @@ export default function Inicio() {
         <View style={{ gap: space(3) }}>
           <Text style={styles.seccion}>Administración</Text>
           <Accion icono="☰" titulo="Usuarios" descripcion="Consultar, crear, editar y eliminar" onPress={() => router.push('/admin/usuarios')} />
-          <Accion icono="✎" titulo="Escenarios" descripcion="Próximamente (Etapa 3)" />
+          <Accion icono="✎" titulo="Escenarios" descripcion="Crear, consultar, editar y eliminar" onPress={() => router.push('/admin/escenarios')} />
         </View>
       ) : null}
 

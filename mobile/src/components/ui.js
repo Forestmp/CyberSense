@@ -67,7 +67,7 @@ export function Button({ title, onPress, variant = 'primary', loading = false, d
   );
 }
 
-export const TextField = forwardRef(function TextField({ label, error, secure = false, hint, style, ...props }, ref) {
+export const TextField = forwardRef(function TextField({ label, error, secure = false, hint, style, inputStyle, multiline, ...props }, ref) {
   const [visible, setVisible] = useState(false);
   return (
     <View style={[styles.field, style]}>
@@ -75,7 +75,8 @@ export const TextField = forwardRef(function TextField({ label, error, secure = 
       <View style={[styles.inputWrap, error && { borderColor: colors.danger }]}>
         <TextInput
           ref={ref}
-          style={styles.input}
+          style={[styles.input, multiline && styles.inputMultiline, inputStyle]}
+          multiline={multiline}
           placeholderTextColor={colors.textMuted}
           secureTextEntry={secure && !visible}
           accessibilityLabel={label}
@@ -185,6 +186,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.border, borderRadius: radius.md,
   },
   input: { flex: 1, minHeight: 48, paddingHorizontal: space(3.5), fontSize: 16, color: colors.text },
+  inputMultiline: { minHeight: 96, paddingTop: space(3), paddingBottom: space(3), textAlignVertical: 'top' },
   eye: { paddingHorizontal: space(3), paddingVertical: space(2) },
   eyeText: { color: colors.primary, fontWeight: '600', fontSize: 13 },
   error: { color: colors.danger, fontSize: 13 },
