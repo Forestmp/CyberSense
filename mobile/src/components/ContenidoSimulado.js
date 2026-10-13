@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, space } from '../theme';
+import { colors, fonts, radius, shadow, space } from '../theme';
 import { FORMATOS } from '../lib/formatos';
 
 /**
@@ -122,23 +122,23 @@ const VISTAS = {
 };
 
 const s = StyleSheet.create({
-  marco: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: space(4), gap: space(2) },
+  marco: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: space(4), gap: space(2), ...shadow.sm },
   correoHeader: { flexDirection: 'row', alignItems: 'center', gap: space(3) },
   avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.primaryDark, fontWeight: '700', fontSize: 18 },
-  negrita: { fontWeight: '700', color: colors.text, fontSize: 15 },
-  tenue: { color: colors.textMuted, fontSize: 13 },
-  asunto: { fontSize: 17, fontWeight: '700', color: colors.text, marginTop: space(1) },
-  cuerpo: { fontSize: 15, color: colors.text, lineHeight: 22 },
+  avatarText: { color: colors.primaryDark, fontFamily: fonts.bold, fontSize: 18 },
+  negrita: { fontFamily: fonts.bold, color: colors.text, fontSize: 15 },
+  tenue: { color: colors.textMuted, fontSize: 13, fontFamily: fonts.regular },
+  asunto: { fontSize: 17, fontFamily: fonts.bold, color: colors.text, marginTop: space(1) },
+  cuerpo: { fontSize: 15, color: colors.text, lineHeight: 22, fontFamily: fonts.regular },
   botonFalso: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingVertical: space(3), alignItems: 'center', marginTop: space(1) },
-  botonFalsoText: { color: '#FFFFFF', fontWeight: '700' },
-  urlPie: { color: colors.textMuted, fontSize: 12 },
+  botonFalsoText: { color: '#FFFFFF', fontFamily: fonts.bold },
+  urlPie: { color: colors.textMuted, fontSize: 12, fontFamily: fonts.regular },
   burbuja: { backgroundColor: '#E5E7EB', borderRadius: 18, borderTopLeftRadius: 4, padding: space(3.5), marginTop: space(2), alignSelf: 'flex-start', maxWidth: '90%', gap: space(1) },
-  enlaceTexto: { color: colors.primary, textDecorationLine: 'underline', fontSize: 15 },
+  enlaceTexto: { color: colors.primary, textDecorationLine: 'underline', fontSize: 15, fontFamily: fonts.regular },
   barraNavegador: { flexDirection: 'row', alignItems: 'center', gap: space(2), backgroundColor: colors.neutralSoft, padding: space(3), borderBottomWidth: 1, borderColor: colors.border },
-  candado: { fontSize: 12, fontWeight: '700', color: colors.textMuted },
-  barraUrl: { flex: 1, backgroundColor: colors.surface, borderRadius: 999, paddingHorizontal: space(3), paddingVertical: space(1.5), fontSize: 13, color: colors.text },
-  etiquetaCampo: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
+  candado: { fontSize: 12, fontFamily: fonts.bold, color: colors.textMuted },
+  barraUrl: { flex: 1, backgroundColor: colors.surface, borderRadius: 999, paddingHorizontal: space(3), paddingVertical: space(1.5), fontSize: 13, color: colors.text, fontFamily: fonts.regular },
+  etiquetaCampo: { fontSize: 13, fontFamily: fonts.semibold, color: colors.textMuted },
   campoFalso: { height: 40, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, backgroundColor: '#FAFAFA' },
   nota: { backgroundColor: colors.warningSoft, borderRadius: radius.md, padding: space(3) },
 });

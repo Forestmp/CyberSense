@@ -1,4 +1,6 @@
-# Sistema móvil para la concientización y evaluación educativa ante ataques de ingeniería social
+# CyberSense
+
+Sistema móvil para la concientización y evaluación educativa ante ataques de ingeniería social.
 
 Trabajo Terminal · ESCOM-IPN
 
@@ -131,3 +133,4 @@ Los rangos de vulnerabilidad (versión `v0-provisional`: crítico < 40 ≤ alto 
 ## Documentación
 
 - [docs/modelo-de-datos.md](docs/modelo-de-datos.md): tablas, relaciones y justificación de los cambios respecto a la propuesta inicial.
+- [docs/frontend.md](docs/frontend.md): identidad visual CyberSense, estructura de la app y endpoints pendientes.

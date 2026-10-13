@@ -4,8 +4,8 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '../../../../api/client';
 import { Badge, Button, Card, FormError, Loading, Screen, Segmented, TextField } from '../../../../components/ui';
 import { useAuth } from '../../../../context/AuthContext';
-import { avisar, confirmar } from '../../../../lib/confirm';
-import { colors, space } from '../../../../theme';
+import { useFeedback } from '../../../../context/FeedbackContext';
+import { colors, space, type } from '../../../../theme';
 
 const ROLES = [{ value: 'usuario', label: 'Usuario' }, { value: 'admin', label: 'Administrador' }];
 const ESTADOS = [
@@ -22,6 +22,7 @@ export default function UsuarioForm() {
   const esNuevo = id === 'nuevo';
   const router = useRouter();
   const { usuario: yo, actualizarUsuario } = useAuth();
+  const { toast, confirm } = useFeedback();
   const esPropio = !esNuevo && Number(id) === yo.id;
 
   const [original, setOriginal] = useState(null);
@@ -72,11 +73,11 @@ export default function UsuarioForm() {
     try {
       if (esNuevo) {
         await api('/users', { method: 'POST', body });
-        avisar('Usuario creado', `${body.nombre} ya puede iniciar sesión.`);
+        toast.exito(`Usuario creado: ${body.nombre} ya puede iniciar sesión`);
       } else {
         const { usuario: u } = await api(`/users/${id}`, { method: 'PUT', body });
         if (esPropio) actualizarUsuario({ ...yo, ...u });
-        avisar('Cambios guardados', original.estado === 'eliminado' ? 'El usuario fue restaurado.' : 'El usuario se actualizó.');
+        toast.exito(original.estado === 'eliminado' ? 'Usuario restaurado correctamente' : 'Usuario actualizado correctamente');
       }
       router.back();
     } catch (e) {
@@ -90,7 +91,7 @@ export default function UsuarioForm() {
   }
 
   async function eliminar() {
-    const ok = await confirmar('Eliminar usuario', `¿Eliminar a ${original.nombre}? Su historial se conserva.`, 'Eliminar');
+    const ok = await confirm({ title: 'Eliminar usuario', message: `¿Eliminar a ${original.nombre}? Su historial se conserva.`, confirmText: 'Eliminar', danger: true });
     if (!ok) return;
     try {
       await api(`/users/${id}`, { method: 'DELETE' });
@@ -112,13 +113,13 @@ export default function UsuarioForm() {
       {!esNuevo ? (
         <Card style={{ gap: space(1.5) }}>
           <View style={{ flexDirection: 'row', gap: space(2), alignItems: 'center' }}>
-            <Text style={{ color: colors.textMuted }}>ID #{original.id}</Text>
+            <Text style={type.small}>ID #{original.id}</Text>
             <Badge value={original.estado} label={original.estado} />
           </View>
-          <Text style={{ color: colors.textMuted, fontSize: 13 }}>Registro: {formatoFecha(original.fecha_registro)}</Text>
-          <Text style={{ color: colors.textMuted, fontSize: 13 }}>Última actualización: {formatoFecha(original.fecha_actualizacion)}</Text>
+          <Text style={type.small}>Registro: {formatoFecha(original.fecha_registro)}</Text>
+          <Text style={type.small}>Última actualización: {formatoFecha(original.fecha_actualizacion)}</Text>
           {eliminado ? (
-            <Text style={{ color: colors.warning, fontSize: 13 }}>
+            <Text style={[type.small, { color: colors.warningText }]}>
               Eliminado el {formatoFecha(original.fecha_eliminacion)}. Elige un estado y guarda para restaurarlo.
             </Text>
           ) : null}
@@ -132,7 +133,7 @@ export default function UsuarioForm() {
         autoCapitalize="none" keyboardType="email-address" inputMode="email"
       />
       {esPropio ? (
-        <Text style={{ color: colors.textMuted, fontSize: 13 }}>No puedes cambiar tu propio rol ni estado.</Text>
+        <Text style={type.small}>No puedes cambiar tu propio rol ni estado.</Text>
       ) : (
         <>
           <Segmented label="Rol" options={ROLES} value={form.rol} onChange={set('rol')} />

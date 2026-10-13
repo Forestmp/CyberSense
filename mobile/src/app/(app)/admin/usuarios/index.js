@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../../../api/client';
 import { Badge, Button, Card, EmptyState, FormError, Segmented, TextField } from '../../../../components/ui';
 import { useAuth } from '../../../../context/AuthContext';
-import { avisar, confirmar } from '../../../../lib/confirm';
-import { colors, space } from '../../../../theme';
+import { useFeedback } from '../../../../context/FeedbackContext';
+import { colors, space, type } from '../../../../theme';
 
 const FILTROS = [
   { value: '', label: 'Todos' },
@@ -21,6 +21,7 @@ const formatoFecha = (iso) => new Date(iso).toLocaleDateString('es-MX', { day: '
 export default function AdminUsuarios() {
   const router = useRouter();
   const { usuario: yo } = useAuth();
+  const { toast, confirm } = useFeedback();
   const [buscar, setBuscar] = useState('');
   const [busquedaAplicada, setBusquedaAplicada] = useState('');
   const [estado, setEstado] = useState('');
@@ -53,13 +54,14 @@ export default function AdminUsuarios() {
   }, [buscar]);
 
   async function eliminar(u) {
-    const ok = await confirmar('Eliminar usuario', `¿Eliminar a ${u.nombre}? Su historial se conserva y podrás restaurarlo después.`, 'Eliminar');
+    const ok = await confirm({ title: 'Eliminar usuario', message: `¿Eliminar a ${u.nombre}? Su historial se conserva y podrás restaurarlo después.`, confirmText: 'Eliminar', danger: true });
     if (!ok) return;
     try {
       await api(`/users/${u.id}`, { method: 'DELETE' });
+      toast.exito('Usuario eliminado');
       cargar(1);
     } catch (e) {
-      avisar('No se pudo eliminar', e.message);
+      toast.error(e.message);
     }
   }
 
@@ -96,7 +98,7 @@ export default function AdminUsuarios() {
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <View style={{ gap: space(3), marginBottom: space(1) }}>
-            <Button title="+ Nuevo usuario" onPress={() => router.push('/admin/usuarios/nuevo')} />
+            <Button title="Nuevo usuario" icon="person-add-outline" onPress={() => router.push('/admin/usuarios/nuevo')} />
             <TextField placeholder="Buscar por nombre o correo" value={buscar} onChangeText={setBuscar} autoCapitalize="none" />
             <Segmented options={FILTROS} value={estado} onChange={setEstado} />
             <FormError message={error} />
@@ -117,10 +119,10 @@ const styles = StyleSheet.create({
   lista: { padding: space(5), gap: space(3), width: '100%', maxWidth: 720, alignSelf: 'center' },
   fila: { gap: space(3) },
   filaTop: { flexDirection: 'row', justifyContent: 'space-between', gap: space(2) },
-  nombre: { fontSize: 16, fontWeight: '600', color: colors.text, flex: 1 },
-  id: { color: colors.textMuted, fontSize: 13 },
-  correo: { color: colors.textMuted, fontSize: 14 },
+  nombre: { ...type.h3, flex: 1 },
+  id: type.small,
+  correo: type.small,
   badges: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: space(2), marginTop: space(1) },
-  meta: { color: colors.textMuted, fontSize: 12 },
+  meta: type.caption,
   acciones: { flexDirection: 'row', gap: space(2) },
 });

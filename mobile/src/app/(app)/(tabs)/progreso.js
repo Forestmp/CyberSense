@@ -2,16 +2,19 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { api } from '../../../api/client';
-import { Button, Card, EmptyState, FormError, Loading, Screen } from '../../../components/ui';
+import { NivelBadge } from '../../../components/NivelBadge';
+import { Button, Card, EmptyState, ErrorState, Ionicons, Loading, ProgressBar, Screen, SectionTitle } from '../../../components/ui';
 import { useAuth } from '../../../context/AuthContext';
-import { nivelInfo, puntos } from '../../../lib/etiquetas';
-import { colors, radius, space } from '../../../theme';
+import { nivelInfo, puntos, tipoInfo } from '../../../lib/etiquetas';
+import { colors, fonts, radius, space, type } from '../../../theme';
 
-function Barra({ valor, color = colors.primary }) {
+function Kpi({ icon, valor, etiqueta }) {
   return (
-    <View style={styles.barraFondo} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: Math.round(valor || 0) }}>
-      <View style={[styles.barra, { width: `${Math.max(0, Math.min(100, valor || 0))}%`, backgroundColor: color }]} />
-    </View>
+    <Card style={styles.kpi} accessibilityLabel={`${etiqueta}: ${valor}`}>
+      <Ionicons name={icon} size={20} color={colors.primary} />
+      <Text style={styles.kpiValor}>{valor}</Text>
+      <Text style={type.caption}>{etiqueta}</Text>
+    </Card>
   );
 }
 
@@ -21,115 +24,117 @@ export default function Progreso() {
   const [m, setM] = useState(null);
   const [error, setError] = useState('');
 
-  useFocusEffect(useCallback(() => {
+  const cargar = useCallback(() => {
+    setError('');
     api(`/users/${usuario.id}/metrics`).then(setM).catch((e) => setError(e.message));
-  }, [usuario.id]));
+  }, [usuario.id]);
+  useFocusEffect(cargar);
 
-  if (!m && !error) return <Loading />;
-  if (!m) return <Screen><FormError message={error} /></Screen>;
+  if (error) return <ErrorState message="No fue posible cargar tu progreso. Intenta nuevamente." onRetry={cargar} />;
+  if (!m) return <Loading />;
 
   const { resumen, por_tipo: porTipo, evolucion } = m;
   if (!resumen.total_simulaciones) {
     return (
       <Screen contentStyle={{ justifyContent: 'center' }}>
-        <EmptyState title="Tu progreso aparecerá aquí" message="Completa tu primera simulación para ver tus métricas por tipo de ataque.">
-          <Button title="Iniciar simulación" onPress={() => router.push('/simulaciones')} style={{ marginTop: space(3) }} />
+        <EmptyState icon="stats-chart-outline" title="Tu progreso aparecerá aquí" message="Completa tu primera simulación para ver tu desempeño por tipo de ataque.">
+          <Button title="Iniciar simulación" icon="play" onPress={() => router.push('/simulaciones')} style={{ marginTop: space(2), alignSelf: 'center' }} />
         </EmptyState>
       </Screen>
     );
   }
 
-  const nivelGeneral = nivelInfo(resumen.nivel_vulnerabilidad);
-
   return (
     <Screen>
-      <Card style={{ gap: space(3) }}>
-        <Text style={styles.seccion}>Resumen general</Text>
-        <View style={styles.grid}>
-          <View style={styles.kpi}><Text style={styles.kpiValor}>{resumen.total_simulaciones}</Text><Text style={styles.kpiEtiqueta}>Simulaciones</Text></View>
-          <View style={styles.kpi}><Text style={styles.kpiValor}>{puntos(resumen.puntaje_promedio)}</Text><Text style={styles.kpiEtiqueta}>Puntaje promedio</Text></View>
-          <View style={styles.kpi}><Text style={styles.kpiValor}>{resumen.tasa_aciertos ?? '—'}%</Text><Text style={styles.kpiEtiqueta}>Decisiones seguras</Text></View>
-          <View style={styles.kpi}>
-            <Text style={styles.kpiValor}>{resumen.escenarios_completados}/{resumen.escenarios_disponibles}</Text>
-            <Text style={styles.kpiEtiqueta}>Escenarios realizados</Text>
+      <Card variant="navy" style={{ gap: space(3) }}>
+        <Text style={[type.overline, { color: '#93C5FD' }]}>Desempeño general</Text>
+        <View style={styles.generalFila}>
+          <View style={{ gap: space(1.5), flex: 1 }}>
+            <Text style={styles.generalValor}>{puntos(resumen.puntaje_promedio)}<Text style={styles.generalDe}> / 100</Text></Text>
+            <Text style={{ color: '#CBD5E1', fontFamily: fonts.regular }}>Puntuación promedio</Text>
+          </View>
+          <View style={{ backgroundColor: '#FFFFFF', borderRadius: radius.pill, padding: 2 }}>
+            <NivelBadge nivel={resumen.nivel_vulnerabilidad} prefijo="" grande />
           </View>
         </View>
-        <View style={[styles.nivel, { backgroundColor: nivelGeneral.bg }]}>
-          <Text style={{ color: nivelGeneral.fg, fontWeight: '700' }}>Vulnerabilidad general: {nivelGeneral.label}</Text>
-        </View>
+        <ProgressBar value={resumen.puntaje_promedio} color={colors.cyan} track="rgba(255,255,255,0.18)" label="Puntuación promedio" />
       </Card>
 
-      <Text style={styles.titulo}>Por tipo de ataque</Text>
+      <View style={styles.kpis}>
+        <Kpi icon="play-circle-outline" valor={resumen.total_simulaciones} etiqueta="Intentos realizados" />
+        <Kpi icon="checkmark-done-outline" valor={`${resumen.tasa_aciertos ?? 0}%`} etiqueta="Decisiones seguras" />
+        <Kpi icon="layers-outline" valor={`${resumen.escenarios_completados}/${resumen.escenarios_disponibles}`} etiqueta="Escenarios realizados" />
+      </View>
+
+      <SectionTitle>Por tipo de ataque</SectionTitle>
       {porTipo.map((t) => {
         const nivel = nivelInfo(t.nivel_vulnerabilidad);
+        const tipo = tipoInfo(t.tipo);
         const total = t.aciertos + t.errores;
         return (
-          <Card key={t.tipo} style={{ gap: space(2.5), opacity: t.total_intentos ? 1 : 0.6 }}>
-            <View style={styles.fila}>
-              <Text style={styles.seccion}>{t.tipo_nombre}</Text>
-              {t.total_intentos ? (
-                <View style={[styles.pill, { backgroundColor: nivel.bg }]}><Text style={{ color: nivel.fg, fontSize: 12, fontWeight: '700' }}>{nivel.label}</Text></View>
-              ) : <Text style={styles.meta}>Sin práctica</Text>}
+          <Card key={t.tipo} style={{ gap: space(3) }}>
+            <View style={styles.tipoFila}>
+              <View style={styles.tipoIcono}><Ionicons name={tipo.icon} size={20} color={colors.primary} /></View>
+              <Text style={[type.h3, { flex: 1 }]}>{t.tipo_nombre}</Text>
+              {t.total_intentos ? <NivelBadge nivel={t.nivel_vulnerabilidad} prefijo="" /> : <Text style={type.caption}>Sin práctica</Text>}
             </View>
             {t.total_intentos ? (
               <>
                 <View style={styles.fila}>
-                  <Text style={styles.meta}>Puntaje promedio</Text>
-                  <Text style={styles.valor}>{puntos(t.puntaje_promedio)} / 100</Text>
+                  <Text style={type.small}>Puntuación promedio</Text>
+                  <Text style={type.bodyStrong}>{puntos(t.puntaje_promedio)} / 100</Text>
                 </View>
-                <Barra valor={t.puntaje_promedio} color={nivel.fg} />
+                <ProgressBar value={t.puntaje_promedio} color={nivel.bar} label={`Puntuación promedio en ${t.tipo_nombre}`} />
                 <View style={styles.fila}>
-                  <Text style={styles.meta}>{t.total_intentos} intento(s) · último: {puntos(t.ultimo_puntaje)}</Text>
-                  <Text style={styles.meta}>
-                    <Text style={{ color: colors.success, fontWeight: '700' }}>{t.aciertos} seguras</Text>
+                  <Text style={type.small}>{t.total_intentos} intento(s) · último {puntos(t.ultimo_puntaje)}</Text>
+                  <Text style={type.small}>
+                    <Text style={{ color: colors.successText, fontFamily: fonts.semibold }}>{t.aciertos} {t.aciertos === 1 ? 'segura' : 'seguras'}</Text>
                     {' · '}
-                    <Text style={{ color: colors.danger, fontWeight: '700' }}>{t.errores} errores</Text>
+                    <Text style={{ color: colors.dangerText, fontFamily: fonts.semibold }}>{t.errores} {t.errores === 1 ? 'error' : 'errores'}</Text>
                   </Text>
                 </View>
-                {total ? <Barra valor={(t.aciertos / total) * 100} color={colors.success} /> : null}
+                {total ? <ProgressBar value={(t.aciertos / total) * 100} color={colors.success} height={6} label="Proporción de decisiones seguras" /> : null}
               </>
-            ) : null}
+            ) : (
+              <Button title={`Practicar ${t.tipo_nombre.toLowerCase()}`} small variant="secondary" onPress={() => router.push('/simulaciones')} />
+            )}
           </Card>
         );
       })}
 
       {evolucion.length > 1 ? (
-        <Card style={{ gap: space(3) }}>
-          <Text style={styles.seccion}>Últimas simulaciones</Text>
-          <View style={styles.grafica}>
-            {evolucion.map((e) => (
-              <View key={e.intento_id} style={styles.columna}>
-                <Text style={styles.colValor}>{Math.round(e.puntaje)}</Text>
-                <View style={[styles.colBarra, { height: `${Math.max(4, e.puntaje)}%`, backgroundColor: colors.primary }]} />
-              </View>
-            ))}
-          </View>
-          <Text style={styles.meta}>Puntaje de cada simulación, de la más antigua a la más reciente.</Text>
-        </Card>
+        <>
+          <SectionTitle>Últimas simulaciones</SectionTitle>
+          <Card style={{ gap: space(3) }}>
+            <View style={styles.grafica} accessibilityLabel={`Puntajes recientes: ${evolucion.map((e) => Math.round(e.puntaje)).join(', ')}`}>
+              {evolucion.map((e) => (
+                <View key={e.intento_id} style={styles.columna}>
+                  <Text style={type.caption}>{Math.round(e.puntaje)}</Text>
+                  <View style={[styles.barra, { height: `${Math.max(4, e.puntaje)}%`, backgroundColor: nivelInfo(e.puntaje >= 80 ? 'bajo' : e.puntaje >= 60 ? 'medio' : e.puntaje >= 40 ? 'alto' : 'critico').bar }]} />
+                </View>
+              ))}
+            </View>
+            <Text style={type.caption}>Puntuación de cada simulación, de la más antigua a la más reciente.</Text>
+          </Card>
+        </>
       ) : null}
 
-      <Text style={styles.nota}>{m.nota}</Text>
+      <Text style={[type.caption, { textAlign: 'center', fontStyle: 'italic' }]}>{m.nota}</Text>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  titulo: { fontSize: 18, fontWeight: '700', color: colors.text, marginTop: space(1) },
-  seccion: { fontSize: 16, fontWeight: '700', color: colors.text },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: space(3) },
-  kpi: { width: '50%', gap: 2 },
-  kpiValor: { fontSize: 24, fontWeight: '800', color: colors.text },
-  kpiEtiqueta: { fontSize: 12, color: colors.textMuted },
-  nivel: { borderRadius: radius.md, padding: space(3), alignItems: 'center' },
+  generalFila: { flexDirection: 'row', alignItems: 'center', gap: space(3), flexWrap: 'wrap' },
+  generalValor: { fontFamily: fonts.extrabold, fontSize: 36, color: '#FFFFFF' },
+  generalDe: { fontFamily: fonts.medium, fontSize: 16, color: '#93C5FD' },
+  kpis: { flexDirection: 'row', gap: space(3) },
+  kpi: { flex: 1, gap: space(1), padding: space(3) },
+  kpiValor: { fontFamily: fonts.bold, fontSize: 22, color: colors.navy },
+  tipoFila: { flexDirection: 'row', alignItems: 'center', gap: space(3) },
+  tipoIcono: { width: 38, height: 38, borderRadius: radius.md, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
   fila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space(2), flexWrap: 'wrap' },
-  meta: { fontSize: 12, color: colors.textMuted },
-  valor: { fontSize: 14, fontWeight: '700', color: colors.text },
-  pill: { borderRadius: radius.sm, paddingHorizontal: space(2), paddingVertical: 2 },
-  barraFondo: { height: 8, borderRadius: 4, backgroundColor: colors.neutralSoft, overflow: 'hidden' },
-  barra: { height: 8, borderRadius: 4 },
-  grafica: { flexDirection: 'row', alignItems: 'flex-end', height: 120, gap: space(2) },
+  grafica: { flexDirection: 'row', alignItems: 'flex-end', height: 130, gap: space(2) },
   columna: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center', gap: 2 },
-  colValor: { fontSize: 10, color: colors.textMuted },
-  colBarra: { width: '70%', maxWidth: 28, borderTopLeftRadius: 4, borderTopRightRadius: 4, opacity: 0.8 },
-  nota: { fontSize: 12, color: colors.textMuted, textAlign: 'center', fontStyle: 'italic' },
+  barra: { width: '70%', maxWidth: 28, borderTopLeftRadius: 6, borderTopRightRadius: 6 },
 });
