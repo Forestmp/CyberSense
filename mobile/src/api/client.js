@@ -10,8 +10,12 @@ import { Platform } from 'react-native';
  */
 function resolverApiUrl() {
   if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '');
+  // Web: mismo host desde el que se abrió la página (localhost en la PC, la IP de la PC desde el navegador del celular).
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
+    return `http://${window.location.hostname}:3000`;
+  }
   const host = Constants.expoConfig?.hostUri?.split(':')[0];
-  if (host && Platform.OS !== 'web') return `http://${host}:3000`;
+  if (host) return `http://${host}:3000`;
   return 'http://localhost:3000';
 }
 
