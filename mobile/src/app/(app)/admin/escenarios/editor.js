@@ -3,11 +3,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../../../api/client';
-import { Button, Card, Loading, Segmented, TextField } from '../../../../components/ui';
-import { avisar } from '../../../../lib/confirm';
+import { Alert, Button, Card, ErrorState, Ionicons, Loading, Segmented, TextField } from '../../../../components/ui';
+import { useFeedback } from '../../../../context/FeedbackContext';
 import { TIPOS_ACCION } from '../../../../lib/etiquetas';
 import { FORMATOS } from '../../../../lib/formatos';
-import { colors, radius, space } from '../../../../theme';
+import { colors, radius, shadow, space, type } from '../../../../theme';
 
 /*
  * Editor de escenarios (crear y editar). El estado local tiene la misma forma
@@ -120,10 +120,13 @@ const PARAMS_INICIALES = {
   SECUENCIA: { opciones: '' },
 };
 
-function Encabezado({ titulo, children }) {
+function Encabezado({ titulo, icon, children }) {
   return (
     <View style={styles.encabezado}>
-      <Text style={styles.seccion}>{titulo}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(2), flex: 1 }}>
+        {icon ? <View style={styles.encIcono}><Ionicons name={icon} size={18} color={colors.primary} /></View> : null}
+        <Text style={styles.seccion}>{titulo}</Text>
+      </View>
       <View style={{ flexDirection: 'row', gap: space(2) }}>{children}</View>
     </View>
   );
@@ -133,6 +136,7 @@ export default function EditorEscenario() {
   const { id } = useLocalSearchParams();
   const esNuevo = !id;
   const router = useRouter();
+  const { toast } = useFeedback();
   const scrollRef = useRef(null);
   const [doc, setDoc] = useState(esNuevo ? clonar(VACIO) : null);
   const [catalogos, setCatalogos] = useState(null);
@@ -147,7 +151,7 @@ export default function EditorEscenario() {
   }, [id, esNuevo]);
 
   if (!doc || !catalogos) {
-    return errores.length ? <View style={{ padding: space(5) }}><Text style={{ color: colors.danger }}>{errores[0]}</Text></View> : <Loading />;
+    return errores.length ? <ErrorState message={`No fue posible cargar el escenario. ${errores[0]}`} onRetry={() => router.back()} /> : <Loading />;
   }
 
   // Aplica una modificación sobre una copia del documento.
@@ -191,7 +195,7 @@ export default function EditorEscenario() {
       const { escenario } = esNuevo
         ? await api('/scenarios', { method: 'POST', body: payload })
         : await api(`/scenarios/${id}`, { method: 'PUT', body: payload });
-      avisar('Escenario guardado', `${escenario.codigo} · ${escenario.titulo}`);
+      toast.exito(`Escenario guardado correctamente (${escenario.codigo})`);
       router.replace(`/admin/escenarios/${escenario.id}`);
     } catch (e) {
       const detalle = Array.isArray(e.details)
@@ -205,9 +209,9 @@ export default function EditorEscenario() {
   }
 
   const ListaErrores = () => (errores.length ? (
-    <View style={styles.errores} accessibilityRole="alert">
-      {errores.map((m, i) => <Text key={i} style={{ color: colors.danger, lineHeight: 20 }}>{i === 0 ? m : `• ${m}`}</Text>)}
-    </View>
+    <Alert tone="error" title={errores[0]}>
+      {errores.slice(1).map((m, i) => <Text key={i} style={[type.small, { color: '#7F1D1D' }]}>• {m}</Text>)}
+    </Alert>
   ) : null);
 
   return (
@@ -217,8 +221,9 @@ export default function EditorEscenario() {
         <ListaErrores />
 
         {/* ---------- Datos generales ---------- */}
+        <Alert tone="info" message="Todo el contenido debe ser ficticio: usa instituciones, dominios y números inventados." />
+        <Encabezado titulo="Datos generales" icon="document-text-outline" />
         <Card style={styles.bloque}>
-          <Text style={styles.seccion}>Datos generales</Text>
           <TextField label="Título" value={doc.titulo} onChangeText={(v) => upd((d) => { d.titulo = v; })} />
           <Segmented label="Tipo de ataque" value={doc.tipo} onChange={(v) => upd((d) => { d.tipo = v; })}
             options={catalogos.tipos_ataque.map((t) => ({ value: t.clave, label: t.nombre }))} />
@@ -234,7 +239,7 @@ export default function EditorEscenario() {
         </Card>
 
         {/* ---------- Señales de alerta ---------- */}
-        <Encabezado titulo={`Señales de alerta (${doc.senales.length})`}>
+        <Encabezado titulo={`Señales de alerta (${doc.senales.length})`} icon='flag-outline'>
           <Button small title="+ Señal" variant="secondary"
             onPress={() => upd((d) => { d.senales.push({ _k: k(), clave: claveUnica('senal', d.senales.map((s) => s.clave)), descripcion: '', explicacion: '' }); })} />
         </Encabezado>
@@ -252,7 +257,7 @@ export default function EditorEscenario() {
         ))}
 
         {/* ---------- Pasos ---------- */}
-        <Encabezado titulo={`Pasos (${doc.pasos.length})`}>
+        <Encabezado titulo={`Pasos y opciones (${doc.pasos.length})`} icon='git-branch-outline'>
           <Button small title="+ Paso" variant="secondary"
             onPress={() => upd((d) => { d.pasos.push(nuevoPaso(claveUnica('paso', d.pasos.map((p) => p.clave)), d.pasos.length === 0)); })} />
         </Encabezado>
@@ -331,7 +336,7 @@ export default function EditorEscenario() {
         ))}
 
         {/* ---------- Reglas ---------- */}
-        <Encabezado titulo={`Reglas de evaluación (${doc.reglas.length})`}>
+        <Encabezado titulo={`Reglas de evaluación (${doc.reglas.length})`} icon='options-outline'>
           <Button small title="+ Regla" variant="secondary" onPress={() => upd((d) => { d.reglas.push(nuevaRegla()); })} />
         </Encabezado>
         {doc.reglas.map((r, ri) => (
@@ -367,9 +372,13 @@ export default function EditorEscenario() {
         ))}
 
         <ListaErrores />
-        <Button title={esNuevo ? 'Crear escenario' : 'Guardar cambios'} onPress={guardar} loading={guardando} />
-        <Button title="Cancelar" variant="ghost" onPress={() => router.back()} />
       </ScrollView>
+      <View style={[styles.barraGuardar, shadow.lg]}>
+        <View style={styles.barraInterior}>
+          <Button title="Cancelar" variant="ghost" onPress={() => router.back()} style={{ flex: 1 }} />
+          <Button title={esNuevo ? 'Crear escenario' : 'Guardar cambios'} icon="save-outline" onPress={guardar} loading={guardando} style={{ flex: 2 }} />
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -378,10 +387,12 @@ const styles = StyleSheet.create({
   contenido: { padding: space(5), gap: space(4), width: '100%', maxWidth: 720, alignSelf: 'center' },
   bloque: { gap: space(3) },
   encabezado: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space(2), marginTop: space(2) },
-  seccion: { fontSize: 17, fontWeight: '700', color: colors.text },
-  subseccion: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
-  label: { fontSize: 14, fontWeight: '600', color: colors.text },
+  seccion: type.h2,
+  subseccion: type.overline,
+  label: type.label,
+  encIcono: { width: 32, height: 32, borderRadius: radius.sm, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  barraGuardar: { backgroundColor: colors.surface, borderTopWidth: 1, borderColor: colors.border, padding: space(3) },
+  barraInterior: { flexDirection: 'row', gap: space(3), width: '100%', maxWidth: 720, alignSelf: 'center' },
   opcion: { borderLeftWidth: 3, paddingLeft: space(3), gap: space(3), paddingVertical: space(2), borderRadius: radius.sm },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space(2) },
-  errores: { backgroundColor: colors.dangerSoft, borderRadius: radius.md, padding: space(3), gap: space(1) },
 });

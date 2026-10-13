@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Text, View } from 'react-native';
-import { api } from '../../api/client';
-import { Badge, Button, Card, FormError, Screen, TextField } from '../../components/ui';
-import { useAuth } from '../../context/AuthContext';
-import { avisar } from '../../lib/confirm';
-import { colors, space } from '../../theme';
+import { api } from '../../../api/client';
+import { Badge, Button, Card, FormError, Screen, TextField } from '../../../components/ui';
+import { useAuth } from '../../../context/AuthContext';
+import { avisar } from '../../../lib/confirm';
+import { colors, space } from '../../../theme';
 
 export default function Perfil() {
   const { usuario, actualizarUsuario, cerrarSesion } = useAuth();

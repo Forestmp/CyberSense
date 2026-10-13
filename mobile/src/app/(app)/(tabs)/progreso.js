@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { api } from '../../api/client';
-import { Button, Card, EmptyState, FormError, Loading, Screen } from '../../components/ui';
-import { useAuth } from '../../context/AuthContext';
-import { nivelInfo, puntos } from '../../lib/etiquetas';
-import { colors, radius, space } from '../../theme';
+import { api } from '../../../api/client';
+import { Button, Card, EmptyState, FormError, Loading, Screen } from '../../../components/ui';
+import { useAuth } from '../../../context/AuthContext';
+import { nivelInfo, puntos } from '../../../lib/etiquetas';
+import { colors, radius, space } from '../../../theme';
 
 function Barra({ valor, color = colors.primary }) {
   return (
@@ -33,7 +33,7 @@ export default function Progreso() {
     return (
       <Screen contentStyle={{ justifyContent: 'center' }}>
         <EmptyState title="Tu progreso aparecerá aquí" message="Completa tu primera simulación para ver tus métricas por tipo de ataque.">
-          <Button title="Iniciar simulación" onPress={() => router.push('/simulacion')} style={{ marginTop: space(3) }} />
+          <Button title="Iniciar simulación" onPress={() => router.push('/simulaciones')} style={{ marginTop: space(3) }} />
         </EmptyState>
       </Screen>
     );

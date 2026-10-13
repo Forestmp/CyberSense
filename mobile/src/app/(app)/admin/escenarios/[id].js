@@ -3,10 +3,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '../../../../api/client';
 import { ContenidoSimulado } from '../../../../components/ContenidoSimulado';
-import { Button, Card, FormError, Loading, Screen } from '../../../../components/ui';
-import { avisar, confirmar } from '../../../../lib/confirm';
+import { Button, Card, ErrorState, Loading, Screen, SectionTitle } from '../../../../components/ui';
+import { useFeedback } from '../../../../context/FeedbackContext';
 import { fechaHora, TIPOS_ACCION } from '../../../../lib/etiquetas';
-import { colors, radius, space } from '../../../../theme';
+import { colors, fonts, radius, space, type } from '../../../../theme';
 import { EstadoBadge } from '../../../../components/EstadoBadge';
 
 const DESCRIPCION_REGLA = {
@@ -20,6 +20,7 @@ const DESCRIPCION_REGLA = {
 export default function VerEscenario() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { toast, confirm } = useFeedback();
   const [e, setE] = useState(null);
   const [error, setError] = useState('');
 
@@ -31,23 +32,25 @@ export default function VerEscenario() {
     try {
       const { escenario } = await api(`/scenarios/${id}`, { method: 'PATCH', body: { estado } });
       setE((prev) => ({ ...prev, estado: escenario.estado }));
+      toast.exito(estado === 'activo' ? 'Escenario activado' : 'Escenario desactivado');
     } catch (err) {
-      avisar('No se pudo cambiar el estado', err.message);
+      toast.error(err.message);
     }
   }
 
   async function eliminar() {
-    if (!(await confirmar('Eliminar escenario', `¿Eliminar «${e.titulo}»? El historial se conserva.`, 'Eliminar'))) return;
+    if (!(await confirm({ title: 'Eliminar escenario', message: `¿Eliminar «${e.titulo}»? El historial de los usuarios se conserva.`, confirmText: 'Eliminar', danger: true }))) return;
     try {
       await api(`/scenarios/${id}`, { method: 'DELETE' });
+      toast.exito('Escenario eliminado');
       router.back();
     } catch (err) {
-      avisar('No se pudo eliminar', err.message);
+      toast.error(err.message);
     }
   }
 
   if (!e && !error) return <Loading />;
-  if (!e) return <Screen><FormError message={error} /></Screen>;
+  if (!e) return <ErrorState message={`No fue posible cargar el escenario. ${error}`} onRetry={() => router.back()} />;
 
   const tituloPaso = (clave) => e.pasos.find((p) => p.clave === clave)?.titulo || clave;
   const eliminado = e.estado === 'eliminado';
@@ -69,15 +72,15 @@ export default function VerEscenario() {
 
       {!eliminado ? (
         <View style={styles.acciones}>
-          <Button small title="Editar" onPress={() => router.push({ pathname: '/admin/escenarios/editor', params: { id } })} style={{ flex: 1 }} />
+          <Button small title="Editar" icon="create-outline" onPress={() => router.push({ pathname: '/admin/escenarios/editor', params: { id } })} style={{ flex: 1 }} />
           {e.estado === 'activo'
-            ? <Button small title="Desactivar" variant="secondary" onPress={() => cambiarEstado('inactivo')} style={{ flex: 1 }} />
-            : <Button small title="Activar" variant="secondary" onPress={() => cambiarEstado('activo')} style={{ flex: 1 }} />}
-          {e.estado === 'activo' ? <Button small title="Probar" variant="secondary" onPress={() => router.push(`/simulacion/${id}`)} style={{ flex: 1 }} /> : null}
+            ? <Button small title="Desactivar" icon="pause-circle-outline" variant="secondary" onPress={() => cambiarEstado('inactivo')} style={{ flex: 1 }} />
+            : <Button small title="Activar" icon="play-circle-outline" variant="secondary" onPress={() => cambiarEstado('activo')} style={{ flex: 1 }} />}
+          {e.estado === 'activo' ? <Button small title="Probar" icon="play-outline" variant="outline" onPress={() => router.push(`/simulacion/${id}`)} style={{ flex: 1 }} /> : null}
         </View>
       ) : null}
 
-      <Text style={styles.seccion}>Señales de alerta ({e.senales.length})</Text>
+      <SectionTitle>Señales de alerta ({e.senales.length})</SectionTitle>
       {e.senales.map((s) => (
         <Card key={s.clave} style={{ gap: 2 }}>
           <Text style={styles.negrita}>{s.descripcion}</Text>
@@ -86,7 +89,7 @@ export default function VerEscenario() {
         </Card>
       ))}
 
-      <Text style={styles.seccion}>Pasos y opciones ({e.pasos.length})</Text>
+      <SectionTitle>Pasos y opciones ({e.pasos.length})</SectionTitle>
       {e.pasos.map((p, i) => (
         <Card key={p.clave} style={{ gap: space(3) }}>
           <Text style={styles.meta}>Paso {i + 1} · {p.clave}{p.es_inicial ? ' · INICIAL' : ''}</Text>
@@ -99,7 +102,7 @@ export default function VerEscenario() {
               <View key={o.clave} style={[styles.opcion, { borderColor: t.fg }]}>
                 <View style={styles.fila}>
                   <Text style={[styles.negrita, { flex: 1 }]}>{o.texto}</Text>
-                  <Text style={{ color: t.fg, fontWeight: '800' }}>{o.puntuacion > 0 ? '+' : ''}{o.puntuacion}</Text>
+                  <Text style={{ color: t.fg, fontFamily: fonts.extrabold }}>{o.puntuacion > 0 ? '+' : ''}{o.puntuacion}</Text>
                 </View>
                 <Text style={styles.meta}>
                   {t.label} · {o.siguiente_paso ? `→ ${tituloPaso(o.siguiente_paso)}` : 'Termina el escenario'}
@@ -112,13 +115,13 @@ export default function VerEscenario() {
         </Card>
       ))}
 
-      <Text style={styles.seccion}>Reglas de evaluación ({e.reglas.length})</Text>
+      <SectionTitle>Reglas de evaluación ({e.reglas.length})</SectionTitle>
       {e.reglas.length === 0 ? <Text style={styles.meta}>Sin reglas específicas.</Text> : null}
       {e.reglas.map((r) => (
         <Card key={r.id} style={{ gap: 2, opacity: r.activa ? 1 : 0.5 }}>
           <View style={styles.fila}>
             <Text style={[styles.negrita, { flex: 1 }]}>{r.descripcion}</Text>
-            <Text style={{ fontWeight: '800', color: r.ajuste_puntuacion < 0 ? colors.danger : colors.success }}>
+            <Text style={{ fontFamily: fonts.extrabold, color: r.ajuste_puntuacion < 0 ? colors.danger : colors.success }}>
               {r.ajuste_puntuacion > 0 ? '+' : ''}{r.ajuste_puntuacion}
             </Text>
           </View>
@@ -129,7 +132,7 @@ export default function VerEscenario() {
 
       {e.retroalimentacion_general ? (
         <>
-          <Text style={styles.seccion}>Retroalimentación general</Text>
+          <SectionTitle>Retroalimentación general</SectionTitle>
           <Card><Text style={styles.texto}>{e.retroalimentacion_general}</Text></Card>
         </>
       ) : null}
@@ -141,12 +144,11 @@ export default function VerEscenario() {
 
 const styles = StyleSheet.create({
   fila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space(2) },
-  codigo: { fontSize: 13, fontWeight: '800', color: colors.primaryDark },
-  titulo: { fontSize: 20, fontWeight: '700', color: colors.text },
-  seccion: { fontSize: 17, fontWeight: '700', color: colors.text, marginTop: space(2) },
-  negrita: { fontSize: 15, fontWeight: '600', color: colors.text },
-  texto: { fontSize: 14, color: colors.text, lineHeight: 20 },
-  meta: { fontSize: 12, color: colors.textMuted },
+  codigo: { fontFamily: fonts.bold, fontSize: 13, color: colors.primary },
+  titulo: type.h1,
+  negrita: type.bodyStrong,
+  texto: type.body,
+  meta: type.caption,
   acciones: { flexDirection: 'row', gap: space(2) },
   opcion: { borderLeftWidth: 3, paddingLeft: space(3), gap: 3, borderRadius: radius.sm },
 });

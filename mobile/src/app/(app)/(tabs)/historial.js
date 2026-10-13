@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { api } from '../../api/client';
-import { Button, Card, EmptyState, FormError } from '../../components/ui';
-import { useAuth } from '../../context/AuthContext';
-import { fechaHora, nivelInfo, puntos } from '../../lib/etiquetas';
-import { colors, radius, space } from '../../theme';
+import { api } from '../../../api/client';
+import { Button, Card, EmptyState, FormError } from '../../../components/ui';
+import { useAuth } from '../../../context/AuthContext';
+import { fechaHora, nivelInfo, puntos } from '../../../lib/etiquetas';
+import { colors, radius, space } from '../../../theme';
 
 export default function Historial() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function Historial() {
         }
         ListEmptyComponent={!cargando ? (
           <EmptyState title="Aún no hay historial" message="Completa una simulación y aparecerá aquí con su puntuación y nivel de vulnerabilidad.">
-            <Button title="Iniciar simulación" onPress={() => router.push('/simulacion')} style={{ marginTop: space(3) }} />
+            <Button title="Iniciar simulación" onPress={() => router.push('/simulaciones')} style={{ marginTop: space(3) }} />
           </EmptyState>
         ) : null}
         ListFooterComponent={

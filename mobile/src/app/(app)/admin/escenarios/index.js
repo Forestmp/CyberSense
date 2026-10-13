@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../../../api/client';
-import { Button, Card, EmptyState, FormError, Segmented, TextField } from '../../../../components/ui';
-import { avisar, confirmar } from '../../../../lib/confirm';
 import { EstadoBadge } from '../../../../components/EstadoBadge';
-import { colors, space } from '../../../../theme';
+import { Dificultad } from '../../../../components/ScenarioCard';
+import { Button, Card, EmptyState, ErrorState, IconButton, Input, Loading, Segmented } from '../../../../components/ui';
+import { useFeedback } from '../../../../context/FeedbackContext';
+import { tipoInfo } from '../../../../lib/etiquetas';
+import { BREAKPOINT_ANCHO, colors, fonts, radius, space, type } from '../../../../theme';
 
 const FILTROS = [
   { value: '', label: 'Todos' },
@@ -18,25 +20,22 @@ const FILTROS = [
 
 export default function AdminEscenarios() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const tabla = width >= BREAKPOINT_ANCHO;
+  const { toast, confirm } = useFeedback();
   const [buscar, setBuscar] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [estado, setEstado] = useState('');
-  const [datos, setDatos] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [cargando, setCargando] = useState(true);
+  const [datos, setDatos] = useState(null);
   const [error, setError] = useState('');
 
   const cargar = useCallback(async () => {
-    setCargando(true);
     setError('');
     try {
       const r = await api('/scenarios', { query: { limite: 100, buscar: busqueda, estado } });
       setDatos(r.datos);
-      setTotal(r.total);
     } catch (e) {
       setError(e.message);
-    } finally {
-      setCargando(false);
     }
   }, [busqueda, estado]);
 
@@ -46,66 +45,144 @@ export default function AdminEscenarios() {
     return () => clearTimeout(t);
   }, [buscar]);
 
-  async function eliminar(e) {
-    const ok = await confirmar('Eliminar escenario', `¿Eliminar «${e.titulo}» (${e.codigo})? Dejará de mostrarse, pero el historial de los usuarios se conserva.`, 'Eliminar');
-    if (!ok) return;
+  const ver = (e) => router.push(`/admin/escenarios/${e.id}`);
+  const editar = (e) => router.push({ pathname: '/admin/escenarios/editor', params: { id: e.id } });
+
+  async function alternarEstado(e) {
+    const nuevo = e.estado === 'activo' ? 'inactivo' : 'activo';
+    if (nuevo === 'inactivo' && !(await confirm({
+      title: 'Desactivar escenario', message: `«${e.titulo}» dejará de mostrarse a los usuarios. Podrás activarlo de nuevo.`, confirmText: 'Desactivar',
+    }))) return;
     try {
-      await api(`/scenarios/${e.id}`, { method: 'DELETE' });
+      await api(`/scenarios/${e.id}`, { method: 'PATCH', body: { estado: nuevo } });
+      toast.exito(nuevo === 'activo' ? 'Escenario activado' : 'Escenario desactivado');
       cargar();
     } catch (err) {
-      avisar('No se pudo eliminar', err.message);
+      toast.error(err.message);
     }
   }
 
-  const renderItem = ({ item: e }) => (
+  async function eliminar(e) {
+    if (!(await confirm({
+      title: 'Eliminar escenario', danger: true, confirmText: 'Eliminar',
+      message: `¿Eliminar «${e.titulo}» (${e.codigo})? Dejará de mostrarse, pero el historial de los usuarios se conserva.`,
+    }))) return;
+    try {
+      await api(`/scenarios/${e.id}`, { method: 'DELETE' });
+      toast.exito('Escenario eliminado');
+      cargar();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }
+
+  const acciones = (e) => (e.estado === 'eliminado' ? (
+    <IconButton icon="eye-outline" label={`Ver ${e.titulo}`} color={colors.primary} onPress={() => ver(e)} />
+  ) : (
+    <View style={styles.acciones}>
+      <IconButton icon="eye-outline" label={`Ver ${e.titulo}`} color={colors.primary} onPress={() => ver(e)} />
+      <IconButton icon="create-outline" label={`Editar ${e.titulo}`} color={colors.primary} onPress={() => editar(e)} />
+      <IconButton
+        icon={e.estado === 'activo' ? 'pause-circle-outline' : 'play-circle-outline'}
+        label={e.estado === 'activo' ? `Desactivar ${e.titulo}` : `Activar ${e.titulo}`}
+        color={colors.warningText} onPress={() => alternarEstado(e)}
+      />
+      <IconButton icon="trash-outline" label={`Eliminar ${e.titulo}`} color={colors.danger} onPress={() => eliminar(e)} />
+    </View>
+  ));
+
+  const FilaTabla = ({ item: e, index }) => (
+    <View style={[styles.fila, styles.filaDatos, index % 2 === 1 && { backgroundColor: '#FBFCFE' }, index === datos.length - 1 && styles.filaUltima]}>
+      <Text style={[styles.celda, styles.cId]}>{e.codigo}</Text>
+      <Text style={[styles.celda, styles.cNombre, { fontFamily: fonts.semibold }]} numberOfLines={2}>{e.titulo}</Text>
+      <Text style={[styles.celda, styles.cTipo]}>{e.tipo_nombre}</Text>
+      <View style={[styles.cDif]}><Dificultad clave={e.dificultad} nombre={e.dificultad_nombre} /></View>
+      <View style={styles.cEstado}><EstadoBadge estado={e.estado} /></View>
+      <View style={styles.cAcciones}>{acciones(e)}</View>
+    </View>
+  );
+
+  const TarjetaMovil = ({ item: e }) => (
     <Card style={{ gap: space(2.5) }}>
-      <View style={styles.filaTop}>
+      <View style={styles.tarjetaTop}>
         <Text style={styles.codigo}>{e.codigo}</Text>
         <EstadoBadge estado={e.estado} />
       </View>
-      <Text style={styles.titulo}>{e.titulo}</Text>
-      <Text style={styles.meta}>{e.tipo_nombre} · {e.dificultad_nombre}</Text>
-      <View style={styles.acciones}>
-        <Button small title="Ver" variant="secondary" onPress={() => router.push(`/admin/escenarios/${e.id}`)} style={{ flex: 1 }} />
-        {e.estado !== 'eliminado' ? (
-          <>
-            <Button small title="Editar" variant="secondary" onPress={() => router.push({ pathname: '/admin/escenarios/editor', params: { id: e.id } })} style={{ flex: 1 }} />
-            <Button small title="Eliminar" variant="danger" onPress={() => eliminar(e)} style={{ flex: 1 }} />
-          </>
-        ) : null}
+      <Text style={type.h3}>{e.titulo}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3) }}>
+        <Text style={type.small}>{tipoInfo(e.tipo).label}</Text>
+        <Dificultad clave={e.dificultad} nombre={e.dificultad_nombre} />
       </View>
+      <View style={styles.tarjetaAcciones}>{acciones(e)}</View>
     </Card>
   );
 
+  const encabezado = (
+    <View style={{ gap: space(3), marginBottom: space(2) }}>
+      <View style={styles.barraSuperior}>
+        <View style={{ flex: 1, minWidth: 220 }}>
+          <Input icon="search" placeholder="Buscar por nombre o ID (PH-001)" value={buscar} onChangeText={setBuscar} autoCapitalize="none" accessibilityLabel="Buscar escenarios" />
+        </View>
+        <Button title="Nuevo escenario" icon="add" onPress={() => router.push('/admin/escenarios/editor')} />
+      </View>
+      <Segmented options={FILTROS} value={estado} onChange={setEstado} />
+      {datos ? <Text style={type.small}>{datos.length} escenario(s)</Text> : null}
+      {tabla && datos?.length ? (
+        <View style={[styles.fila, styles.filaEncabezado]}>
+          <Text style={[styles.cId, styles.th]}>ID</Text>
+          <Text style={[styles.th, styles.cNombre]}>Nombre</Text>
+          <Text style={[styles.th, styles.cTipo]}>Tipo</Text>
+          <Text style={[styles.th, styles.cDif]}>Dificultad</Text>
+          <Text style={[styles.th, styles.cEstado]}>Estado</Text>
+          <Text style={[styles.th, styles.cAcciones, { textAlign: 'right' }]}>Acciones</Text>
+        </View>
+      ) : null}
+    </View>
+  );
+
+  if (!datos && !error) return <Loading />;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['bottom']}>
-      <FlatList
-        data={datos}
-        keyExtractor={(e) => String(e.id)}
-        renderItem={renderItem}
-        contentContainerStyle={styles.lista}
-        keyboardShouldPersistTaps="handled"
-        ListHeaderComponent={
-          <View style={{ gap: space(3), marginBottom: space(1) }}>
-            <Button title="+ Nuevo escenario" onPress={() => router.push('/admin/escenarios/editor')} />
-            <TextField placeholder="Buscar por título o código" value={buscar} onChangeText={setBuscar} autoCapitalize="none" />
-            <Segmented options={FILTROS} value={estado} onChange={setEstado} />
-            <FormError message={error} />
-            <Text style={styles.meta}>{total} escenario(s)</Text>
-          </View>
-        }
-        ListEmptyComponent={!cargando ? <EmptyState title="Sin escenarios" message="No hay escenarios con estos criterios." /> : null}
-        ListFooterComponent={cargando ? <ActivityIndicator color={colors.primary} style={{ margin: space(4) }} /> : null}
-      />
+      {error && !datos ? <ErrorState message="No fue posible cargar los escenarios. Intenta nuevamente." onRetry={cargar} /> : (
+        <FlatList
+          key={tabla ? 'tabla' : 'tarjetas'}
+          data={datos}
+          keyExtractor={(e) => String(e.id)}
+          renderItem={tabla ? FilaTabla : TarjetaMovil}
+          contentContainerStyle={[styles.lista, { maxWidth: tabla ? 1100 : 560 }]}
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={encabezado}
+          ListEmptyComponent={<EmptyState icon="layers-outline" title="Sin escenarios" message="No hay escenarios con estos criterios." />}
+          ItemSeparatorComponent={tabla ? null : () => <View style={{ height: space(3) }} />}
+        />
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  lista: { padding: space(5), gap: space(3), width: '100%', maxWidth: 720, alignSelf: 'center' },
-  filaTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  codigo: { fontSize: 13, fontWeight: '800', color: colors.primaryDark },
-  titulo: { fontSize: 16, fontWeight: '600', color: colors.text },
-  meta: { fontSize: 13, color: colors.textMuted },
-  acciones: { flexDirection: 'row', gap: space(2) },
+  lista: { padding: space(5), width: '100%', alignSelf: 'center' },
+  barraSuperior: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', gap: space(3) },
+  // Tabla (tablet / escritorio)
+  filaDatos: { borderLeftWidth: 1, borderRightWidth: 1 },
+  filaUltima: { borderBottomLeftRadius: radius.lg, borderBottomRightRadius: radius.lg },
+  fila: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space(4), paddingVertical: space(3), borderBottomWidth: 1, borderColor: colors.border, gap: space(3), backgroundColor: colors.surface },
+  filaEncabezado: {
+    backgroundColor: colors.primarySoft, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg,
+    borderWidth: 1, borderColor: colors.border, marginBottom: -space(2),
+  },
+  th: { fontFamily: fonts.bold, fontSize: 12, color: colors.navy, textTransform: 'uppercase', letterSpacing: 0.5 },
+  celda: { ...type.body },
+  cId: { width: 80, fontFamily: fonts.bold, color: colors.primary, fontSize: 14 },
+  cNombre: { flex: 1 },
+  cTipo: { width: 170 },
+  cDif: { width: 120 },
+  cEstado: { width: 110 },
+  cAcciones: { width: 176, alignItems: 'flex-end' },
+  acciones: { flexDirection: 'row', gap: space(1) },
+  // Tarjetas (móvil)
+  tarjetaTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  codigo: { fontFamily: fonts.bold, fontSize: 13, color: colors.primary },
+  tarjetaAcciones: { borderTopWidth: 1, borderColor: colors.border, paddingTop: space(2), alignItems: 'flex-end' },
 });

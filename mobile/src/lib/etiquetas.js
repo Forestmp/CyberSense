@@ -1,32 +1,47 @@
 import { colors } from '../theme';
 
+/** Niveles de vulnerabilidad: color + ícono + texto (nunca solo color). */
 export const NIVELES = {
-  bajo: { label: 'Bajo', bg: colors.successSoft, fg: colors.success },
-  medio: { label: 'Medio', bg: colors.warningSoft, fg: colors.warning },
-  alto: { label: 'Alto', bg: '#FFEDD5', fg: '#C2410C' },
-  critico: { label: 'Crítico', bg: colors.dangerSoft, fg: colors.danger },
+  bajo: { label: 'Baja', icon: 'shield-checkmark', bg: colors.successSoft, fg: colors.successText, bar: colors.success },
+  medio: { label: 'Media', icon: 'alert-circle', bg: colors.warningSoft, fg: colors.warningText, bar: colors.warning },
+  alto: { label: 'Alta', icon: 'warning', bg: '#FFEDD5', fg: '#C2410C', bar: '#EA580C' },
+  critico: { label: 'Crítica', icon: 'close-circle', bg: colors.dangerSoft, fg: colors.dangerText, bar: colors.danger },
 };
 
-export const nivelInfo = (nivel) => NIVELES[nivel] || { label: '—', bg: colors.neutralSoft, fg: colors.textMuted };
+export const nivelInfo = (nivel) =>
+  NIVELES[nivel] || { label: 'Sin datos', icon: 'help-circle-outline', bg: colors.neutralSoft, fg: colors.textMuted, bar: colors.border };
+
+export const TIPOS_ATAQUE = {
+  phishing: { icon: 'mail-outline', label: 'Phishing' },
+  smishing: { icon: 'chatbubble-ellipses-outline', label: 'Smishing' },
+  suplantacion_identidad: { icon: 'person-remove-outline', label: 'Suplantación de identidad' },
+};
+export const tipoInfo = (tipo) => TIPOS_ATAQUE[tipo] || { icon: 'shield-outline', label: tipo };
+
+export const DIFICULTADES = {
+  basico: { label: 'Básico', nivel: 1 },
+  intermedio: { label: 'Intermedio', nivel: 2 },
+  avanzado: { label: 'Avanzado', nivel: 3 },
+};
 
 export const TIPOS_ACCION = {
-  segura: { label: 'Segura', bg: colors.successSoft, fg: colors.success },
+  segura: { label: 'Segura', bg: colors.successSoft, fg: colors.successText },
   neutral: { label: 'Neutral', bg: colors.neutralSoft, fg: colors.textMuted },
-  riesgosa: { label: 'Riesgosa', bg: colors.warningSoft, fg: colors.warning },
-  critica: { label: 'Crítica', bg: colors.dangerSoft, fg: colors.danger },
+  riesgosa: { label: 'Riesgosa', bg: colors.warningSoft, fg: colors.warningText },
+  critica: { label: 'Crítica', bg: colors.dangerSoft, fg: colors.dangerText },
 };
 
 export const VALORACIONES = {
-  correcta: { label: 'Decisión segura', icono: '✓', fg: colors.success, bg: colors.successSoft },
-  mejorable: { label: 'Decisión mejorable', icono: '•', fg: colors.warning, bg: colors.warningSoft },
-  incorrecta: { label: 'Decisión riesgosa', icono: '✕', fg: colors.danger, bg: colors.dangerSoft },
+  correcta: { label: 'Decisión segura', icono: '✓', icon: 'checkmark-circle', fg: colors.successText, bg: colors.successSoft },
+  mejorable: { label: 'Decisión mejorable', icono: '•', icon: 'remove-circle', fg: colors.warningText, bg: colors.warningSoft },
+  incorrecta: { label: 'Decisión riesgosa', icono: '✕', icon: 'close-circle', fg: colors.dangerText, bg: colors.dangerSoft },
 };
 
 export const ESTADOS_ESCENARIO = {
-  activo: { label: 'Activo', bg: colors.successSoft, fg: colors.success },
-  borrador: { label: 'Borrador', bg: colors.primarySoft, fg: colors.primaryDark },
-  inactivo: { label: 'Inactivo', bg: colors.warningSoft, fg: colors.warning },
-  eliminado: { label: 'Eliminado', bg: colors.neutralSoft, fg: colors.textMuted },
+  activo: { label: 'Activo', icon: 'checkmark-circle', bg: colors.successSoft, fg: colors.successText },
+  borrador: { label: 'Borrador', icon: 'create-outline', bg: colors.primarySoft, fg: colors.primary },
+  inactivo: { label: 'Inactivo', icon: 'pause-circle', bg: colors.warningSoft, fg: colors.warningText },
+  eliminado: { label: 'Eliminado', icon: 'trash-outline', bg: colors.neutralSoft, fg: colors.textMuted },
 };
 
 export const fecha = (iso) =>

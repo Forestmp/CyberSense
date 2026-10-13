@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Ingeniería Social TT",
-    "slug": "tt-ingenieria-social",
+    "name": "CyberSense",
+    "slug": "cybersense",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -20,13 +20,20 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "name": "CyberSense",
+      "shortName": "CyberSense",
+      "themeColor": "#0B1F4D",
+      "description": "Aprende a identificar riesgos digitales antes de que sea demasiado tarde."
     },
     "plugins": [
       "expo-router",
       "expo-status-bar",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
-    "scheme": "ttingsocial"
+    "scheme": "cybersense",
+    "backgroundColor": "#F8FAFC",
+    "primaryColor": "#2563EB"
   }
 }

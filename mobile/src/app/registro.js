@@ -1,18 +1,25 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Link } from 'expo-router';
-import { Button, FormError, Screen, Subtitle, TextField, Title } from '../components/ui';
+import { AuthLayout } from '../components/AuthLayout';
+import { Button, FormError, Ionicons, Input } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
-import { colors, space } from '../theme';
-import { Marca } from '../components/Marca';
+import { colors, fonts, space, type } from '../theme';
+
+const reglasPassword = (p) => [
+  { ok: p.length >= 8, texto: 'Al menos 8 caracteres' },
+  { ok: /[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(p), texto: 'Al menos una letra' },
+  { ok: /\d/.test(p), texto: 'Al menos un número' },
+];
+const correoValido = (c) => /^\S+@\S+\.\S+$/.test(c.trim());
 
 function validar({ nombre, correo, password, confirmar_password }) {
   const e = {};
-  if (nombre.trim().length < 2) e.nombre = 'Escribe tu nombre';
-  if (!/^\S+@\S+\.\S+$/.test(correo.trim())) e.correo = 'Escribe un correo válido';
-  if (password.length < 8) e.password = 'Mínimo 8 caracteres';
-  else if (!/[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(password) || !/\d/.test(password)) e.password = 'Debe incluir letras y números';
-  if (confirmar_password !== password) e.confirmar_password = 'Las contraseñas no coinciden';
+  if (nombre.trim().length < 2) e.nombre = 'Escribe tu nombre (mínimo 2 caracteres)';
+  if (!correoValido(correo)) e.correo = 'Escribe un correo válido, por ejemplo nombre@dominio.com';
+  if (!reglasPassword(password).every((r) => r.ok)) e.password = 'La contraseña no cumple los requisitos';
+  if (!confirmar_password) e.confirmar_password = 'Confirma tu contraseña';
+  else if (confirmar_password !== password) e.confirmar_password = 'Las contraseñas no coinciden';
   return e;
 }
 
@@ -22,7 +29,10 @@ export default function Registro() {
   const [errores, setErrores] = useState({});
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
-  const set = (campo) => (valor) => setForm((f) => ({ ...f, [campo]: valor }));
+  const set = (campo) => (valor) => {
+    setForm((f) => ({ ...f, [campo]: valor }));
+    if (errores[campo]) setErrores((e) => ({ ...e, [campo]: undefined }));
+  };
 
   async function enviar() {
     setError('');
@@ -40,34 +50,39 @@ export default function Registro() {
     }
   }
 
+  const reglas = reglasPassword(form.password);
+
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Screen edges={['top', 'bottom']} contentStyle={{ justifyContent: 'center' }}>
-        <Marca />
-        <View style={{ gap: space(1) }}>
-          <Title>Crear cuenta</Title>
-          <Subtitle>Aprende a reconocer engaños por correo, SMS y suplantación de identidad.</Subtitle>
-        </View>
-        <FormError message={error} />
-        <TextField label="Nombre" value={form.nombre} onChangeText={set('nombre')} error={errores.nombre} autoComplete="name" />
-        <TextField
-          label="Correo electrónico" value={form.correo} onChangeText={set('correo')} error={errores.correo}
-          autoCapitalize="none" autoComplete="email" keyboardType="email-address" inputMode="email"
-        />
-        <TextField
-          label="Contraseña" value={form.password} onChangeText={set('password')} error={errores.password}
-          secure autoComplete="new-password" hint="Mínimo 8 caracteres, con letras y números"
-        />
-        <TextField
-          label="Confirmar contraseña" value={form.confirmar_password} onChangeText={set('confirmar_password')}
-          error={errores.confirmar_password} secure autoComplete="new-password" onSubmitEditing={enviar}
-        />
-        <Button title="Crear cuenta" onPress={enviar} loading={enviando} />
-        <Text style={{ textAlign: 'center', color: colors.textMuted }}>
-          ¿Ya tienes cuenta?{' '}
-          <Link href="/login" style={{ color: colors.primary, fontWeight: '600' }}>Inicia sesión</Link>
+    <AuthLayout
+      title="Crea tu cuenta"
+      subtitle="Aprende a reconocer engaños por correo, SMS y suplantación de identidad."
+      footer={(
+        <Text style={[type.body, { textAlign: 'center', color: colors.textMuted }]}>
+          ¿Ya tienes una cuenta?{' '}
+          <Link href="/login" style={{ color: colors.primary, fontFamily: fonts.semibold }}>Inicia sesión</Link>
         </Text>
-      </Screen>
-    </KeyboardAvoidingView>
+      )}
+    >
+      <FormError message={error} />
+      <Input label="Nombre" icon="person-outline" value={form.nombre} onChangeText={set('nombre')} error={errores.nombre}
+        autoComplete="name" placeholder="Tu nombre" valid={form.nombre.trim().length >= 2} />
+      <Input label="Correo electrónico" icon="mail-outline" value={form.correo} onChangeText={set('correo')} error={errores.correo}
+        autoCapitalize="none" autoComplete="email" keyboardType="email-address" inputMode="email"
+        placeholder="tucorreo@ejemplo.com" valid={correoValido(form.correo)} />
+      <Input label="Contraseña" icon="lock-closed-outline" value={form.password} onChangeText={set('password')} error={errores.password}
+        secure autoComplete="new-password" placeholder="Crea una contraseña" />
+      <View style={{ gap: space(1), marginTop: -space(1) }} accessibilityLabel="Requisitos de la contraseña">
+        {reglas.map((r) => (
+          <View key={r.texto} style={{ flexDirection: 'row', alignItems: 'center', gap: space(1.5) }}>
+            <Ionicons name={r.ok ? 'checkmark-circle' : 'ellipse-outline'} size={15} color={r.ok ? colors.success : colors.textMuted} />
+            <Text style={[type.small, r.ok && { color: colors.successText }]}>{r.texto}</Text>
+          </View>
+        ))}
+      </View>
+      <Input label="Confirmar contraseña" icon="lock-closed-outline" value={form.confirmar_password} onChangeText={set('confirmar_password')}
+        error={errores.confirmar_password} secure autoComplete="new-password" placeholder="Repite tu contraseña"
+        valid={!!form.confirmar_password && form.confirmar_password === form.password} onSubmitEditing={enviar} />
+      <Button title="Crear cuenta" size="lg" onPress={enviar} loading={enviando} />
+    </AuthLayout>
   );
 }
