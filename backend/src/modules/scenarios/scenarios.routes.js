@@ -6,6 +6,8 @@ const AppError = require('../../utils/AppError');
 const repo = require('./scenarios.repository');
 const service = require('./scenarios.service');
 const { escenarioDoc, listQuery, patchSchema } = require('./scenarios.schemas');
+const metrics = require('../metrics/metrics.repository');
+const { seleccionarSiguiente } = require('../adaptive/selector');
 
 const router = Router();
 router.use(authenticate);
@@ -17,7 +19,21 @@ const esAdmin = (req) => req.user.rol === 'admin';
  * Admin: todos salvo eliminados, filtrables por estado.
  */
 router.get('/', validate({ query: listQuery }), async (req, res) => {
-  res.json(await repo.listar({ ...req.valid.query, soloActivos: !esAdmin(req) }));
+  const lista = await repo.listar({ ...req.valid.query, soloActivos: !esAdmin(req) });
+  // Cada escenario incluye el desempeño del propio usuario en él.
+  const stats = await metrics.estadisticasPorEscenario(req.user.id);
+  lista.datos = lista.datos.map((e) => ({
+    ...e,
+    mis_intentos: stats.get(e.id)?.intentos ?? 0,
+    mi_mejor_puntaje: stats.get(e.id)?.mejor_puntaje ?? null,
+    mi_ultimo_nivel: stats.get(e.id)?.ultimo_nivel ?? null,
+  }));
+  res.json(lista);
+});
+
+/** Siguiente escenario sugerido (punto de extensión del motor adaptativo). */
+router.get('/recommended', async (req, res) => {
+  res.json({ recomendacion: await seleccionarSiguiente(req.user.id) });
 });
 
 /**

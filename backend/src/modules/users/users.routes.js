@@ -7,6 +7,7 @@ const { idParam, correo, password, nombre } = require('../../utils/schemas');
 const AppError = require('../../utils/AppError');
 const users = require('./users.repository');
 const { hashPassword } = require('../auth/auth.service');
+const metrics = require('../metrics/metrics.repository');
 
 const router = Router();
 router.use(authenticate);
@@ -65,6 +66,24 @@ router.delete('/:id', requireRole('admin'), validate({ params: idParam }), async
   if (!usuario || usuario.estado === 'eliminado') throw AppError.notFound('Usuario no encontrado');
   await users.softDelete(id);
   res.status(204).end();
+});
+
+// --- Historial y métricas (propio usuario o admin) -------------------------
+
+const historyQuery = z.object({
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(20),
+  tipo: z.string().regex(/^[a-z_]{2,40}$/).optional(),
+});
+
+router.get('/:id/history', validate({ params: idParam, query: historyQuery }), requireSelfOrAdmin(), async (req, res) => {
+  if (!(await users.findById(req.valid.params.id))) throw AppError.notFound('Usuario no encontrado');
+  res.json(await metrics.historial(req.valid.params.id, req.valid.query));
+});
+
+router.get('/:id/metrics', validate({ params: idParam }), requireSelfOrAdmin(), async (req, res) => {
+  if (!(await users.findById(req.valid.params.id))) throw AppError.notFound('Usuario no encontrado');
+  res.json(await metrics.metricas(req.valid.params.id));
 });
 
 // --- Perfil (propio usuario o admin) ---------------------------------------
