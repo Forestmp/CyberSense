@@ -64,7 +64,9 @@
           "puntuacion": 10,
           "siguiente_paso": "detalle_remitente",
           "retroalimentacion": "Revisar el remitente antes de actuar es uno de los hábitos más efectivos para detectar phishing.",
-          "senales": ["remitente_sospechoso"]
+          "senales": [
+            "remitente_sospechoso"
+          ]
         },
         {
           "clave": "ignorar_correo",
@@ -82,7 +84,10 @@
           "puntuacion": 15,
           "siguiente_paso": null,
           "retroalimentacion": "Verificar por un canal oficial, sin usar el enlace recibido, es la forma correcta de comprobar un aviso.",
-          "senales": ["enlace_no_oficial"]
+          "senales": [
+            "urgencia_amenaza",
+            "enlace_no_oficial"
+          ]
         }
       ]
     },
@@ -133,7 +138,9 @@
           "puntuacion": 15,
           "siguiente_paso": null,
           "retroalimentacion": "Confirmar con el banco por un canal oficial es una respuesta segura ante cualquier duda.",
-          "senales": []
+          "senales": [
+            "urgencia_amenaza"
+          ]
         }
       ]
     },
@@ -147,7 +154,12 @@
         "url": "http://bancoaurora.verificacion-cuentas.info/login",
         "titulo_pagina": "Banco Aurora · Verificación de cuenta",
         "mensaje": "Para evitar el bloqueo de su cuenta, confirme la siguiente información:",
-        "campos": ["Número de tarjeta", "Fecha de vencimiento", "NIP", "Código de token"]
+        "campos": [
+          "Número de tarjeta",
+          "Fecha de vencimiento",
+          "NIP",
+          "Código de token"
+        ]
       },
       "opciones": [
         {
@@ -166,7 +178,9 @@
           "puntuacion": 10,
           "siguiente_paso": "detalle_url",
           "retroalimentacion": "Revisar la dirección web permite detectar sitios falsos aunque su apariencia sea idéntica a la original.",
-          "senales": ["enlace_no_oficial"]
+          "senales": [
+            "enlace_no_oficial"
+          ]
         },
         {
           "clave": "cerrar_pagina",
@@ -175,7 +189,9 @@
           "puntuacion": 10,
           "siguiente_paso": null,
           "retroalimentacion": "Cerrar la página sin ingresar datos evitó el daño. Lo ideal habría sido no abrir el enlace.",
-          "senales": ["solicitud_datos_sensibles"]
+          "senales": [
+            "solicitud_datos_sensibles"
+          ]
         },
         {
           "clave": "contactar_banco_sitio",
@@ -184,7 +200,10 @@
           "puntuacion": 15,
           "siguiente_paso": null,
           "retroalimentacion": "Ante la duda, contactar al banco por un canal oficial es la decisión correcta.",
-          "senales": ["solicitud_datos_sensibles"]
+          "senales": [
+            "urgencia_amenaza",
+            "solicitud_datos_sensibles"
+          ]
         }
       ]
     },
@@ -217,7 +236,9 @@
           "puntuacion": 15,
           "siguiente_paso": null,
           "retroalimentacion": "Cerrar el sitio y reportar el intento es la respuesta más completa.",
-          "senales": ["solicitud_datos_sensibles"]
+          "senales": [
+            "solicitud_datos_sensibles"
+          ]
         },
         {
           "clave": "cerrar_tras_revisar",
@@ -226,7 +247,9 @@
           "puntuacion": 10,
           "siguiente_paso": null,
           "retroalimentacion": "Cerrar la página fue correcto; reportarla también ayudaría a proteger a otras personas.",
-          "senales": ["solicitud_datos_sensibles"]
+          "senales": [
+            "solicitud_datos_sensibles"
+          ]
         }
       ]
     }
@@ -234,21 +257,30 @@
   "reglas": [
     {
       "tipo_regla": "TIPO_ACCION_PRESENTE",
-      "parametros": { "tipo_accion": "critica" },
+      "parametros": {
+        "tipo_accion": "critica"
+      },
       "ajuste_puntuacion": -10,
       "descripcion": "Entregó información sensible",
       "retroalimentacion": "Entregaste información sensible. Si te ocurre en la vida real, llama de inmediato a tu banco para bloquear la tarjeta y cambia tus claves."
     },
     {
       "tipo_regla": "SECUENCIA",
-      "parametros": { "opciones": ["revisar_remitente", "abrir_tras_revisar"] },
+      "parametros": {
+        "opciones": [
+          "revisar_remitente",
+          "abrir_tras_revisar"
+        ]
+      },
       "ajuste_puntuacion": -5,
       "descripcion": "Detectó el remitente sospechoso pero continuó",
       "retroalimentacion": "Identificaste que el remitente era sospechoso, pero continuaste. Cuando detectes una señal de alerta, detente."
     },
     {
       "tipo_regla": "OPCION_SELECCIONADA",
-      "parametros": { "opcion": "reportar_correo" },
+      "parametros": {
+        "opcion": "reportar_correo"
+      },
       "ajuste_puntuacion": 0,
       "descripcion": "Reportó el intento de phishing",
       "retroalimentacion": "Reportar los intentos de phishing es una buena práctica que protege a toda la comunidad."

@@ -3,6 +3,10 @@
  *  1. Archivos .sql de db/seeds (catálogos, rangos provisionales).
  *  2. Escenarios de db/seeds/escenarios/*.json (se omiten si su código ya existe).
  *  3. Usuario administrador, si ADMIN_EMAIL y ADMIN_PASSWORD están definidos.
+ *
+ * Con --actualizar-escenarios, los escenarios existentes se sobrescriben con su
+ * JSON (conservando ids de lo que mantiene su clave). Sobrescribe cambios
+ * hechos desde la app, así que úsalo solo en desarrollo.
  */
 const fs = require('fs');
 const path = require('path');
@@ -10,6 +14,7 @@ const bcrypt = require('bcrypt');
 const env = require('../src/config/env');
 const { pool, withTransaction } = require('../src/db/pool');
 const repo = require('../src/modules/scenarios/scenarios.repository');
+const scenariosService = require('../src/modules/scenarios/scenarios.service');
 const { validarEstructura } = require('../src/modules/scenarios/scenarios.structure');
 const { escenarioDoc } = require('../src/modules/scenarios/scenarios.schemas');
 
@@ -43,7 +48,7 @@ async function seedAdmin() {
   return rows[0].id;
 }
 
-async function seedEscenarios(adminId) {
+async function seedEscenarios(adminId, { actualizar = false } = {}) {
   const dir = path.join(DIR, 'escenarios');
   for (const archivo of fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
     const crudo = JSON.parse(fs.readFileSync(path.join(dir, archivo), 'utf8'));
@@ -56,7 +61,12 @@ async function seedEscenarios(adminId) {
     const errores = validarEstructura(doc);
     if (errores.length) throw new Error(`${archivo} inválido:\n  - ${errores.join('\n  - ')}`);
 
-    const existe = await pool.query('SELECT 1 FROM escenarios WHERE codigo = $1', [doc.codigo]);
+    const existe = await pool.query('SELECT id FROM escenarios WHERE codigo = $1', [doc.codigo]);
+    if (existe.rows.length && actualizar) {
+      await scenariosService.actualizar(existe.rows[0].id, doc);
+      console.log(`✔ Escenario ${doc.codigo} actualizado desde ${archivo}`);
+      continue;
+    }
     if (existe.rows.length) {
       console.log(`· Escenario ${doc.codigo} ya existe`);
       continue;
@@ -70,16 +80,16 @@ async function seedEscenarios(adminId) {
   }
 }
 
-async function seed() {
+async function seed(opciones = {}) {
   await seedSql();
   const adminId = await seedAdmin();
-  await seedEscenarios(adminId);
+  await seedEscenarios(adminId, opciones);
 }
 
 module.exports = { seed };
 
 if (require.main === module) {
-  seed()
+  seed({ actualizar: process.argv.includes('--actualizar-escenarios') })
     .then(() => pool.end())
     .catch((err) => {
       console.error(err.message);

@@ -79,30 +79,31 @@ async function obtenerDocumento(id, db = { query }) {
   );
   if (!esc) return null;
 
-  const [senales, pasos, opciones, opSen, reglas, intentos] = await Promise.all([
-    db.query('SELECT id, clave, descripcion, explicacion FROM senales_alerta WHERE escenario_id = $1 ORDER BY orden', [id]),
-    db.query(
-      `SELECT id, clave, titulo, pregunta, es_inicial, contenido FROM escenario_pasos
-        WHERE escenario_id = $1 ORDER BY orden`, [id]
-    ),
-    db.query(
-      `SELECT o.id, o.paso_id, o.clave, o.texto, o.tipo_accion, o.puntuacion, o.retroalimentacion, sp.clave AS siguiente_paso
-         FROM opciones o
-         JOIN escenario_pasos p ON p.id = o.paso_id
-         LEFT JOIN escenario_pasos sp ON sp.id = o.siguiente_paso_id
-        WHERE p.escenario_id = $1 ORDER BY o.orden`, [id]
-    ),
-    db.query(
-      `SELECT os.opcion_id, s.clave FROM opcion_senal os
-         JOIN senales_alerta s ON s.id = os.senal_id
-        WHERE s.escenario_id = $1 ORDER BY s.orden`, [id]
-    ),
-    db.query(
-      `SELECT id, tipo_regla, parametros, ajuste_puntuacion, descripcion, retroalimentacion, activa
-         FROM reglas_evaluacion WHERE escenario_id = $1 ORDER BY prioridad, id`, [id]
-    ),
-    db.query(`SELECT count(*)::int AS n FROM intentos WHERE escenario_id = $1`, [id]),
-  ]);
+  // Secuencial: `db` puede ser un cliente de transacción, que no admite consultas simultáneas.
+  const senales = await db.query(
+    'SELECT id, clave, descripcion, explicacion FROM senales_alerta WHERE escenario_id = $1 ORDER BY orden', [id]
+  );
+  const pasos = await db.query(
+    `SELECT id, clave, titulo, pregunta, es_inicial, contenido FROM escenario_pasos
+      WHERE escenario_id = $1 ORDER BY orden`, [id]
+  );
+  const opciones = await db.query(
+    `SELECT o.id, o.paso_id, o.clave, o.texto, o.tipo_accion, o.puntuacion, o.retroalimentacion, sp.clave AS siguiente_paso
+       FROM opciones o
+       JOIN escenario_pasos p ON p.id = o.paso_id
+       LEFT JOIN escenario_pasos sp ON sp.id = o.siguiente_paso_id
+      WHERE p.escenario_id = $1 ORDER BY o.orden`, [id]
+  );
+  const opSen = await db.query(
+    `SELECT os.opcion_id, s.clave FROM opcion_senal os
+       JOIN senales_alerta s ON s.id = os.senal_id
+      WHERE s.escenario_id = $1 ORDER BY s.orden`, [id]
+  );
+  const reglas = await db.query(
+    `SELECT id, tipo_regla, parametros, ajuste_puntuacion, descripcion, retroalimentacion, activa
+       FROM reglas_evaluacion WHERE escenario_id = $1 ORDER BY prioridad, id`, [id]
+  );
+  const intentos = await db.query('SELECT count(*)::int AS n FROM intentos WHERE escenario_id = $1', [id]);
 
   const senalesPorOpcion = new Map();
   for (const r of opSen.rows) {
