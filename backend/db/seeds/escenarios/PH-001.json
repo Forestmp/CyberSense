@@ -1,0 +1,257 @@
+{
+  "codigo": "PH-001",
+  "titulo": "Cuenta bancaria bloqueada",
+  "tipo": "phishing",
+  "dificultad": "basico",
+  "estado": "activo",
+  "descripcion": "Recibes un correo que dice venir de tu banco y te pide verificar tus datos para evitar el bloqueo de tu cuenta.",
+  "contenido": {
+    "contexto": "Eres cliente de Banco Aurora (institución ficticia). Su sitio oficial es bancoaurora.mx y tienes instalada su app oficial. Es martes por la mañana y revisas tu correo."
+  },
+  "retroalimentacion_general": "Los bancos no solicitan verificar datos, contraseñas, NIP ni códigos mediante enlaces enviados por correo. Ante cualquier aviso, entra por la app oficial o llama al número que aparece al reverso de tu tarjeta.",
+  "senales": [
+    {
+      "clave": "remitente_sospechoso",
+      "descripcion": "El dominio del remitente no es el oficial del banco",
+      "explicacion": "El correo viene de bancoaurora-seguridad.info, no de bancoaurora.mx. Los atacantes registran dominios parecidos al original."
+    },
+    {
+      "clave": "urgencia_amenaza",
+      "descripcion": "Mensaje urgente con amenaza de bloqueo",
+      "explicacion": "Presionar con plazos cortos y amenazas busca que actúes sin pensar."
+    },
+    {
+      "clave": "enlace_no_oficial",
+      "descripcion": "El enlace dirige a un sitio que no es el oficial",
+      "explicacion": "La dirección bancoaurora.verificacion-cuentas.info pertenece al dominio verificacion-cuentas.info, no al banco."
+    },
+    {
+      "clave": "solicitud_datos_sensibles",
+      "descripcion": "Se solicitan datos sensibles (tarjeta, NIP, token)",
+      "explicacion": "Ninguna institución legítima pide tu NIP o código de token por un formulario web enlazado desde un correo."
+    }
+  ],
+  "pasos": [
+    {
+      "clave": "correo",
+      "titulo": "Nuevo correo en tu bandeja",
+      "pregunta": "¿Qué haces?",
+      "es_inicial": true,
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Banco Aurora",
+        "remitente_correo": "alertas@bancoaurora-seguridad.info",
+        "asunto": "URGENTE: Su cuenta será bloqueada",
+        "fecha": "Hoy, 9:12",
+        "cuerpo": "Estimado cliente:\n\nDetectamos actividad sospechosa. Su cuenta será bloqueada en las próximas 24 horas. Verifique sus datos en el siguiente enlace para evitar la suspensión.\n\nAtentamente,\nDepartamento de Seguridad",
+        "enlace_texto": "Verificar mis datos",
+        "enlace_url": "http://bancoaurora.verificacion-cuentas.info/login"
+      },
+      "opciones": [
+        {
+          "clave": "abrir_enlace",
+          "texto": "Abrir el enlace",
+          "tipo_accion": "riesgosa",
+          "puntuacion": -10,
+          "siguiente_paso": "sitio_falso",
+          "retroalimentacion": "Abrir enlaces de mensajes inesperados puede llevarte a sitios falsos o descargar software malicioso.",
+          "senales": []
+        },
+        {
+          "clave": "revisar_remitente",
+          "texto": "Revisar el remitente",
+          "tipo_accion": "segura",
+          "puntuacion": 10,
+          "siguiente_paso": "detalle_remitente",
+          "retroalimentacion": "Revisar el remitente antes de actuar es uno de los hábitos más efectivos para detectar phishing.",
+          "senales": ["remitente_sospechoso"]
+        },
+        {
+          "clave": "ignorar_correo",
+          "texto": "Ignorar el mensaje",
+          "tipo_accion": "neutral",
+          "puntuacion": 5,
+          "siguiente_paso": null,
+          "retroalimentacion": "Ignorar el mensaje evitó el riesgo, aunque no identificaste por qué era fraudulento ni lo reportaste.",
+          "senales": []
+        },
+        {
+          "clave": "app_oficial",
+          "texto": "Entrar directamente a la aplicación oficial del banco",
+          "tipo_accion": "segura",
+          "puntuacion": 15,
+          "siguiente_paso": null,
+          "retroalimentacion": "Verificar por un canal oficial, sin usar el enlace recibido, es la forma correcta de comprobar un aviso.",
+          "senales": ["enlace_no_oficial"]
+        }
+      ]
+    },
+    {
+      "clave": "detalle_remitente",
+      "titulo": "Detalle del remitente",
+      "pregunta": "Ahora que viste el remitente, ¿qué haces?",
+      "es_inicial": false,
+      "contenido": {
+        "formato": "detalle_remitente",
+        "remitente_nombre": "Banco Aurora",
+        "remitente_correo": "alertas@bancoaurora-seguridad.info",
+        "dominio": "bancoaurora-seguridad.info",
+        "nota": "El nombre visible dice «Banco Aurora», pero el dominio del correo es bancoaurora-seguridad.info."
+      },
+      "opciones": [
+        {
+          "clave": "abrir_tras_revisar",
+          "texto": "Abrir el enlace de todos modos",
+          "tipo_accion": "riesgosa",
+          "puntuacion": -15,
+          "siguiente_paso": "sitio_falso",
+          "retroalimentacion": "Detectar una señal de alerta y continuar de todos modos anula la precaución inicial.",
+          "senales": []
+        },
+        {
+          "clave": "reportar_correo",
+          "texto": "Reportar el mensaje como phishing y eliminarlo",
+          "tipo_accion": "segura",
+          "puntuacion": 15,
+          "siguiente_paso": null,
+          "retroalimentacion": "Reportar el mensaje ayuda a que tu proveedor de correo y el banco bloqueen la campaña y protejan a otras personas.",
+          "senales": []
+        },
+        {
+          "clave": "eliminar_correo",
+          "texto": "Eliminar el mensaje",
+          "tipo_accion": "neutral",
+          "puntuacion": 5,
+          "siguiente_paso": null,
+          "retroalimentacion": "Eliminarlo evita el riesgo; reportarlo además protege a otras personas.",
+          "senales": []
+        },
+        {
+          "clave": "contactar_banco_correo",
+          "texto": "Contactar al banco mediante un canal oficial",
+          "tipo_accion": "segura",
+          "puntuacion": 15,
+          "siguiente_paso": null,
+          "retroalimentacion": "Confirmar con el banco por un canal oficial es una respuesta segura ante cualquier duda.",
+          "senales": []
+        }
+      ]
+    },
+    {
+      "clave": "sitio_falso",
+      "titulo": "Se abrió una página web",
+      "pregunta": "La página te pide tus datos. ¿Qué haces?",
+      "es_inicial": false,
+      "contenido": {
+        "formato": "sitio_web",
+        "url": "http://bancoaurora.verificacion-cuentas.info/login",
+        "titulo_pagina": "Banco Aurora · Verificación de cuenta",
+        "mensaje": "Para evitar el bloqueo de su cuenta, confirme la siguiente información:",
+        "campos": ["Número de tarjeta", "Fecha de vencimiento", "NIP", "Código de token"]
+      },
+      "opciones": [
+        {
+          "clave": "ingresar_datos",
+          "texto": "Introducir la información solicitada",
+          "tipo_accion": "critica",
+          "puntuacion": -30,
+          "siguiente_paso": null,
+          "retroalimentacion": "Ingresar datos de tarjeta, NIP o token en un sitio no verificado permite a los atacantes vaciar tu cuenta.",
+          "senales": []
+        },
+        {
+          "clave": "revisar_url",
+          "texto": "Revisar la dirección (URL) de la página",
+          "tipo_accion": "segura",
+          "puntuacion": 10,
+          "siguiente_paso": "detalle_url",
+          "retroalimentacion": "Revisar la dirección web permite detectar sitios falsos aunque su apariencia sea idéntica a la original.",
+          "senales": ["enlace_no_oficial"]
+        },
+        {
+          "clave": "cerrar_pagina",
+          "texto": "Cerrar la página",
+          "tipo_accion": "segura",
+          "puntuacion": 10,
+          "siguiente_paso": null,
+          "retroalimentacion": "Cerrar la página sin ingresar datos evitó el daño. Lo ideal habría sido no abrir el enlace.",
+          "senales": ["solicitud_datos_sensibles"]
+        },
+        {
+          "clave": "contactar_banco_sitio",
+          "texto": "Contactar al banco mediante un canal oficial",
+          "tipo_accion": "segura",
+          "puntuacion": 15,
+          "siguiente_paso": null,
+          "retroalimentacion": "Ante la duda, contactar al banco por un canal oficial es la decisión correcta.",
+          "senales": ["solicitud_datos_sensibles"]
+        }
+      ]
+    },
+    {
+      "clave": "detalle_url",
+      "titulo": "Dirección de la página",
+      "pregunta": "Después de revisar la dirección, ¿qué haces?",
+      "es_inicial": false,
+      "contenido": {
+        "formato": "detalle_url",
+        "url": "http://bancoaurora.verificacion-cuentas.info/login",
+        "dominio_real": "verificacion-cuentas.info",
+        "usa_https": false,
+        "nota": "La dirección comienza con «bancoaurora», pero el dominio real es verificacion-cuentas.info y la conexión no es segura (http)."
+      },
+      "opciones": [
+        {
+          "clave": "ingresar_tras_revisar",
+          "texto": "Introducir la información de todos modos",
+          "tipo_accion": "critica",
+          "puntuacion": -35,
+          "siguiente_paso": null,
+          "retroalimentacion": "Ingresar datos después de identificar que el sitio es falso expone por completo tu cuenta.",
+          "senales": []
+        },
+        {
+          "clave": "cerrar_y_reportar",
+          "texto": "Cerrar la página y reportar el correo",
+          "tipo_accion": "segura",
+          "puntuacion": 15,
+          "siguiente_paso": null,
+          "retroalimentacion": "Cerrar el sitio y reportar el intento es la respuesta más completa.",
+          "senales": ["solicitud_datos_sensibles"]
+        },
+        {
+          "clave": "cerrar_tras_revisar",
+          "texto": "Cerrar la página",
+          "tipo_accion": "segura",
+          "puntuacion": 10,
+          "siguiente_paso": null,
+          "retroalimentacion": "Cerrar la página fue correcto; reportarla también ayudaría a proteger a otras personas.",
+          "senales": ["solicitud_datos_sensibles"]
+        }
+      ]
+    }
+  ],
+  "reglas": [
+    {
+      "tipo_regla": "TIPO_ACCION_PRESENTE",
+      "parametros": { "tipo_accion": "critica" },
+      "ajuste_puntuacion": -10,
+      "descripcion": "Entregó información sensible",
+      "retroalimentacion": "Entregaste información sensible. Si te ocurre en la vida real, llama de inmediato a tu banco para bloquear la tarjeta y cambia tus claves."
+    },
+    {
+      "tipo_regla": "SECUENCIA",
+      "parametros": { "opciones": ["revisar_remitente", "abrir_tras_revisar"] },
+      "ajuste_puntuacion": -5,
+      "descripcion": "Detectó el remitente sospechoso pero continuó",
+      "retroalimentacion": "Identificaste que el remitente era sospechoso, pero continuaste. Cuando detectes una señal de alerta, detente."
+    },
+    {
+      "tipo_regla": "OPCION_SELECCIONADA",
+      "parametros": { "opcion": "reportar_correo" },
+      "ajuste_puntuacion": 0,
+      "descripcion": "Reportó el intento de phishing",
+      "retroalimentacion": "Reportar los intentos de phishing es una buena práctica que protege a toda la comunidad."
+    }
+  ]
+}

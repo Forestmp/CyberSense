@@ -1,0 +1,27 @@
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const env = require('./config/env');
+const { query } = require('./db/pool');
+const { notFoundHandler, errorHandler } = require('./middlewares/errorHandler');
+
+const app = express();
+
+app.disable('x-powered-by');
+app.use(helmet());
+app.use(cors({ origin: env.corsOrigins.length ? env.corsOrigins : true }));
+app.use(express.json({ limit: '200kb' }));
+
+app.get('/api/health', async (req, res) => {
+  try {
+    await query('SELECT 1');
+    res.json({ status: 'ok', database: 'ok' });
+  } catch {
+    res.status(503).json({ status: 'degraded', database: 'unavailable' });
+  }
+});
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+module.exports = app;
