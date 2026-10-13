@@ -11,6 +11,7 @@ const env = require('../src/config/env');
 const { pool, withTransaction } = require('../src/db/pool');
 const repo = require('../src/modules/scenarios/scenarios.repository');
 const { validarEstructura } = require('../src/modules/scenarios/scenarios.structure');
+const { escenarioDoc } = require('../src/modules/scenarios/scenarios.schemas');
 
 const DIR = path.join(__dirname, '..', 'db', 'seeds');
 
@@ -45,7 +46,13 @@ async function seedAdmin() {
 async function seedEscenarios(adminId) {
   const dir = path.join(DIR, 'escenarios');
   for (const archivo of fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()) {
-    const doc = JSON.parse(fs.readFileSync(path.join(dir, archivo), 'utf8'));
+    const crudo = JSON.parse(fs.readFileSync(path.join(dir, archivo), 'utf8'));
+    const parsed = escenarioDoc.safeParse(crudo);
+    if (!parsed.success) {
+      const detalle = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('\n  - ');
+      throw new Error(`${archivo} inválido:\n  - ${detalle}`);
+    }
+    const doc = { ...parsed.data, codigo: crudo.codigo };
     const errores = validarEstructura(doc);
     if (errores.length) throw new Error(`${archivo} inválido:\n  - ${errores.join('\n  - ')}`);
 
@@ -57,14 +64,7 @@ async function seedEscenarios(adminId) {
     await withTransaction(async (client) => {
       const cat = await repo.resolverCatalogos(client, doc.tipo, doc.dificultad);
       if (!cat.tipo_ataque_id || !cat.dificultad_id) throw new Error(`${archivo}: tipo o dificultad desconocidos`);
-      const { rows } = await client.query(
-        `INSERT INTO escenarios (codigo, titulo, tipo_ataque_id, dificultad_id, descripcion, contenido,
-                                 retroalimentacion_general, estado, creado_por)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-        [doc.codigo, doc.titulo, cat.tipo_ataque_id, cat.dificultad_id, doc.descripcion, doc.contenido || {},
-          doc.retroalimentacion_general || null, doc.estado || 'borrador', adminId]
-      );
-      await repo.insertarEstructura(client, rows[0].id, doc);
+      await repo.crear(client, doc, cat, adminId);
     });
     console.log(`✔ Escenario ${doc.codigo} · ${doc.titulo}`);
   }

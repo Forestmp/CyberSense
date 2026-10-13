@@ -23,6 +23,8 @@ app.get('/api/health', async (req, res) => {
 
 app.use('/api/auth', require('./modules/auth/auth.routes'));
 app.use('/api/users', require('./modules/users/users.routes'));
+app.use('/api/catalogos', require('./modules/scenarios/catalogs.routes'));
+app.use('/api/scenarios', require('./modules/scenarios/scenarios.routes'));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
