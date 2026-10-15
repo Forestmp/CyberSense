@@ -82,6 +82,20 @@ npx expo start                # escanea el QR con Expo Go, o pulsa "w" para abri
 - Para apuntar a otra API, crea `mobile/.env` con `EXPO_PUBLIC_API_URL=http://<ip>:3000`.
 - Si no conecta, permite Node.js en el Firewall de Windows.
 
+## 4. Despliegue de la API (Render)
+
+La base de datos ya vive en Supabase; en Render solo corre la API. La configuración está en [render.yaml](render.yaml).
+
+1. Sube el repositorio a GitHub (privado). El archivo `backend/.env` nunca se sube.
+2. En Render: **New → Blueprint** y selecciona el repositorio.
+3. Captura el único secreto que Render pide: `DATABASE_URL` (la cadena del Session pooler de Supabase). `JWT_SECRET` lo genera Render.
+4. Cada push a `main` vuelve a desplegar. Al iniciar se aplican las migraciones pendientes.
+5. Comprueba `https://<tu-servicio>.onrender.com/api/health`.
+
+En el plan gratuito, el servicio se suspende tras 15 minutos sin uso; la primera petición después de eso tarda entre 30 y 50 segundos.
+
+Para que el APK use la API publicada, compílalo con `EXPO_PUBLIC_API_URL=https://<tu-servicio>.onrender.com`.
+
 ## API
 
 Todas las rutas, excepto registro, login y health, requieren `Authorization: Bearer <token>`. Los errores tienen la forma `{ error: { code, message, details } }`.

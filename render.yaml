@@ -1,0 +1,38 @@
+# Despliegue de la API de CyberSense en Render (Blueprint).
+# Render > New > Blueprint > selecciona este repositorio.
+# La base de datos sigue en Supabase; aquí solo corre la API.
+services:
+  - type: web
+    name: cybersense-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm ci
+    # Las migraciones son idempotentes: solo aplican las pendientes.
+    startCommand: npm run db:migrate && npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.22.2
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DB_SSL
+        value: "true"
+      # El Session pooler de Supabase (plan gratuito) admite pocas conexiones.
+      - key: DB_POOL_MAX
+        value: "5"
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: CORS_ORIGINS
+        value: ""
+      # Secretos: se capturan en el panel de Render, nunca en el repositorio.
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

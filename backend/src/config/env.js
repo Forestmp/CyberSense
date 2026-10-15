@@ -14,6 +14,9 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
   JWT_EXPIRES_IN: z.string().default('8h'),
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
+  // Número de proxies delante de la API (Render = 1). Necesario para que el
+  // límite de intentos use la IP real del cliente.
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 });
 
 const parsed = schema.safeParse(process.env);
