@@ -9,3 +9,4 @@ coverage/
 dist/
 web-build/
 .DS_Store
+!mobile/.env.production

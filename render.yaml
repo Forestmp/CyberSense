@@ -6,11 +6,11 @@ services:
     name: cybersense-api
     runtime: node
     plan: free
-    region: oregon
-    rootDir: backend
-    buildCommand: npm ci
+    region: virginia
+    # Los comandos entran a backend/ por sí mismos (no depende de rootDir).
+    buildCommand: cd backend && npm ci
     # Las migraciones son idempotentes: solo aplican las pendientes.
-    startCommand: npm run db:migrate && npm start
+    startCommand: cd backend && npm run db:migrate && npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
