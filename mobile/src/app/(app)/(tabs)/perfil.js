@@ -32,7 +32,7 @@ function Opcion({ icon, titulo, onPress, color = colors.text }) {
 
 export default function Perfil() {
   const router = useRouter();
-  const { usuario, esAdmin, actualizarUsuario, cerrarSesion } = useAuth();
+  const { usuario, esAdmin, actualizarUsuario, cerrarSesion, renovarToken } = useAuth();
   const { toast, confirm } = useFeedback();
   const [modal, setModal] = useState(null); // 'datos' | 'password'
   const [datos, setDatos] = useState({ nombre: '', correo: '' });
@@ -72,9 +72,10 @@ export default function Perfil() {
     }
     setGuardando(true);
     try {
-      await api(`/users/${usuario.id}`, { method: 'PUT', body: { password_actual: pwd.password_actual, password_nueva: pwd.password_nueva } });
+      const r = await api(`/users/${usuario.id}`, { method: 'PUT', body: { password_actual: pwd.password_actual, password_nueva: pwd.password_nueva } });
+      if (r.token) await renovarToken(r.token);
       setModal(null);
-      toast.exito('Contraseña actualizada correctamente');
+      toast.exito('Contraseña actualizada. Se cerró la sesión en tus otros dispositivos.');
     } catch (e) {
       setErrores({ campos: e.camposConError, msg: e.message });
     } finally {

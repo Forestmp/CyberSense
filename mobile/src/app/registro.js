@@ -2,22 +2,17 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import { AuthLayout } from '../components/AuthLayout';
-import { Button, FormError, Ionicons, Input } from '../components/ui';
+import { Button, FormError, Input } from '../components/ui';
+import { PasswordRules } from '../components/PasswordRules';
+import { correoValido, passwordValida } from '../lib/validacion';
 import { useAuth } from '../context/AuthContext';
 import { colors, fonts, space, type } from '../theme';
-
-const reglasPassword = (p) => [
-  { ok: p.length >= 8, texto: 'Al menos 8 caracteres' },
-  { ok: /[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(p), texto: 'Al menos una letra' },
-  { ok: /\d/.test(p), texto: 'Al menos un número' },
-];
-const correoValido = (c) => /^\S+@\S+\.\S+$/.test(c.trim());
 
 function validar({ nombre, correo, password, confirmar_password }) {
   const e = {};
   if (nombre.trim().length < 2) e.nombre = 'Escribe tu nombre (mínimo 2 caracteres)';
   if (!correoValido(correo)) e.correo = 'Escribe un correo válido, por ejemplo nombre@dominio.com';
-  if (!reglasPassword(password).every((r) => r.ok)) e.password = 'La contraseña no cumple los requisitos';
+  if (!passwordValida(password)) e.password = 'La contraseña no cumple los requisitos';
   if (!confirmar_password) e.confirmar_password = 'Confirma tu contraseña';
   else if (confirmar_password !== password) e.confirmar_password = 'Las contraseñas no coinciden';
   return e;
@@ -50,8 +45,6 @@ export default function Registro() {
     }
   }
 
-  const reglas = reglasPassword(form.password);
-
   return (
     <AuthLayout
       title="Crea tu cuenta"
@@ -71,14 +64,7 @@ export default function Registro() {
         placeholder="tucorreo@ejemplo.com" valid={correoValido(form.correo)} />
       <Input label="Contraseña" icon="lock-closed-outline" value={form.password} onChangeText={set('password')} error={errores.password}
         secure autoComplete="new-password" placeholder="Crea una contraseña" />
-      <View style={{ gap: space(1), marginTop: -space(1) }} accessibilityLabel="Requisitos de la contraseña">
-        {reglas.map((r) => (
-          <View key={r.texto} style={{ flexDirection: 'row', alignItems: 'center', gap: space(1.5) }}>
-            <Ionicons name={r.ok ? 'checkmark-circle' : 'ellipse-outline'} size={15} color={r.ok ? colors.success : colors.textMuted} />
-            <Text style={[type.small, r.ok && { color: colors.successText }]}>{r.texto}</Text>
-          </View>
-        ))}
-      </View>
+      <PasswordRules password={form.password} />
       <Input label="Confirmar contraseña" icon="lock-closed-outline" value={form.confirmar_password} onChangeText={set('confirmar_password')}
         error={errores.confirmar_password} secure autoComplete="new-password" placeholder="Repite tu contraseña"
         valid={!!form.confirmar_password && form.confirmar_password === form.password} onSubmitEditing={enviar} />

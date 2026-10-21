@@ -6,7 +6,7 @@ const { authenticate, requireRole, requireSelfOrAdmin } = require('../../middlew
 const { idParam, correo, password, nombre } = require('../../utils/schemas');
 const AppError = require('../../utils/AppError');
 const users = require('./users.repository');
-const { hashPassword } = require('../auth/auth.service');
+const { hashPassword, firmarToken } = require('../auth/auth.service');
 const metrics = require('../metrics/metrics.repository');
 
 const router = Router();
@@ -126,7 +126,13 @@ router.put('/:id', validate({ params: idParam, body: updateSchema }), requireSel
   }
   if (datos.correo && datos.correo !== actual.correo) await asegurarCorreoLibre(datos.correo, id);
 
-  res.json({ usuario: await users.update(id, cambios) });
+  const usuario = await users.update(id, cambios);
+  // Cambiar la contraseña invalida los tokens anteriores; el propio usuario
+  // recibe uno nuevo para no cerrar su sesión actual.
+  if (password_nueva && esPropio) {
+    return res.json({ usuario, token: firmarToken(usuario, await users.getTokenVersion(id)) });
+  }
+  res.json({ usuario });
 });
 
 module.exports = router;

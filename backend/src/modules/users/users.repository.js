@@ -9,10 +9,15 @@ async function findById(id) {
 
 async function findByEmailWithHash(correo) {
   const { rows } = await query(
-    `SELECT ${CAMPOS_PUBLICOS}, password_hash FROM usuarios WHERE lower(correo) = lower($1)`,
+    `SELECT ${CAMPOS_PUBLICOS}, password_hash, token_version FROM usuarios WHERE lower(correo) = lower($1)`,
     [correo]
   );
   return rows[0] || null;
+}
+
+async function getTokenVersion(id) {
+  const { rows } = await query('SELECT token_version FROM usuarios WHERE id = $1', [id]);
+  return rows[0]?.token_version ?? 0;
 }
 
 async function getPasswordHash(id) {
@@ -70,7 +75,9 @@ async function update(id, cambios) {
   const permitidas = ['nombre', 'correo', 'password_hash', 'rol', 'estado', 'fecha_eliminacion'];
   const columnas = Object.keys(cambios).filter((k) => permitidas.includes(k) && cambios[k] !== undefined);
   if (!columnas.length) return findById(id);
-  const sets = columnas.map((c, i) => `${c} = $${i + 2}`).join(', ');
+  // Cambiar la contraseña invalida los tokens emitidos antes (otras sesiones).
+  const extra = columnas.includes('password_hash') ? ', token_version = token_version + 1' : '';
+  const sets = columnas.map((c, i) => `${c} = $${i + 2}`).join(', ') + extra;
   const { rows } = await query(
     `UPDATE usuarios SET ${sets} WHERE id = $1 RETURNING ${CAMPOS_PUBLICOS}`,
     [id, ...columnas.map((c) => cambios[c])]
@@ -82,4 +89,4 @@ async function softDelete(id) {
   await query(`UPDATE usuarios SET estado = 'eliminado', fecha_eliminacion = now() WHERE id = $1`, [id]);
 }
 
-module.exports = { findById, findByEmailWithHash, getPasswordHash, list, create, update, softDelete };
+module.exports = { findById, findByEmailWithHash, getPasswordHash, getTokenVersion, list, create, update, softDelete };

@@ -8,8 +8,9 @@ const users = require('../users/users.repository');
 // tiempo de respuesta no revele qué correos están registrados.
 const HASH_RELLENO = bcrypt.hashSync('relleno-no-utilizable', env.BCRYPT_ROUNDS);
 
-const firmarToken = (usuario) =>
-  jwt.sign({ sub: String(usuario.id), rol: usuario.rol }, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
+/** `ver` es la versión de sesión del usuario; si cambia, el token deja de ser válido. */
+const firmarToken = (usuario, ver = 0) =>
+  jwt.sign({ sub: String(usuario.id), rol: usuario.rol, ver }, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
 
 const hashPassword = (password) => bcrypt.hash(password, env.BCRYPT_ROUNDS);
 
@@ -25,8 +26,8 @@ async function login({ correo, password }) {
   if (!encontrado || !valida) throw AppError.unauthorized('Correo o contraseña incorrectos');
   if (encontrado.estado !== 'activo') throw AppError.forbidden('La cuenta no está activa');
 
-  const { password_hash, ...usuario } = encontrado; // eslint-disable-line no-unused-vars
-  return { token: firmarToken(usuario), usuario };
+  const { password_hash, token_version, ...usuario } = encontrado; // eslint-disable-line no-unused-vars
+  return { token: firmarToken(usuario, token_version), usuario };
 }
 
-module.exports = { register, login, hashPassword };
+module.exports = { register, login, hashPassword, firmarToken };

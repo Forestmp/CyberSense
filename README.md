@@ -94,6 +94,10 @@ La base de datos ya vive en Supabase; en Render solo corre la API. La configurac
 
 En el plan gratuito, el servicio se suspende tras 15 minutos sin uso; la primera petición después de eso tarda entre 30 y 50 segundos.
 
+### Correo de recuperación de contraseña
+
+La API envía el código con **Brevo** (API HTTP; el plan gratuito de Render bloquea SMTP). En Render agrega `MAIL_PROVIDER=brevo`, `BREVO_API_KEY` y `MAIL_FROM_EMAIL` (un remitente verificado en Brevo). Sin esas variables, el código solo aparece en los logs del servidor.
+
 Para que el APK use la API publicada, compílalo con `EXPO_PUBLIC_API_URL=https://<tu-servicio>.onrender.com`.
 
 ## API
@@ -104,6 +108,8 @@ Todas las rutas, excepto registro, login y health, requieren `Authorization: Bea
 |---|---|---|---|
 | POST | `/api/auth/register` | público | Registro (nombre, correo, contraseña, confirmación) |
 | POST | `/api/auth/login` | público | Inicio de sesión |
+| POST | `/api/auth/forgot-password` | público | Envía un código de 6 dígitos al correo (misma respuesta exista o no la cuenta) |
+| POST | `/api/auth/reset-password` | público | Restablece la contraseña con el código e inicia sesión; cierra las demás sesiones |
 | GET | `/api/auth/me` | usuario | Usuario autenticado |
 | GET | `/api/users` | admin | Listado paginado, con búsqueda y filtros |
 | POST | `/api/users` | admin | Crear usuario con rol |

@@ -46,6 +46,10 @@ export function AuthProvider({ children }) {
     esAdmin: usuario?.rol === 'admin',
     iniciarSesion: async (correo, password) => abrirSesion(await api('/auth/login', { method: 'POST', body: { correo, password } })),
     registrarse: async (datos) => abrirSesion(await api('/auth/register', { method: 'POST', body: datos })),
+    // Restablece la contraseña con el código recibido por correo e inicia sesión.
+    restablecerPassword: async (datos) => abrirSesion(await api('/auth/reset-password', { method: 'POST', body: datos })),
+    // Tras cambiar la contraseña la API emite un token nuevo (el anterior deja de valer).
+    renovarToken: async (token) => { setAuthToken(token); await storage.set(TOKEN_KEY, token); },
     cerrarSesion,
     actualizarUsuario: setUsuario,
   }), [usuario, cargando, abrirSesion, cerrarSesion]);

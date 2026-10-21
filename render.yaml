@@ -36,3 +36,12 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      # Correo para recuperar contraseña (Brevo). Con "console" el código solo aparece en los logs.
+      - key: MAIL_PROVIDER
+        value: brevo
+      - key: MAIL_FROM_NAME
+        value: CyberSense
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM_EMAIL
+        sync: false

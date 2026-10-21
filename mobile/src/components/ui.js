@@ -394,7 +394,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: colors.border, borderRadius: radius.md,
   },
   inputFoco: { boxShadow: '0px 0px 0px 3px rgba(37, 99, 235, 0.15)' },
-  input: { flex: 1, minHeight: 50, paddingHorizontal: space(3.5), fontSize: 16, fontFamily: fonts.regular, color: colors.text },
+  // minWidth 0: en web el campo no se encoge y los íconos se salen; outline: el foco ya se marca en el contenedor.
+  input: { flex: 1, minWidth: 0, minHeight: 50, paddingHorizontal: space(3.5), fontSize: 16, fontFamily: fonts.regular, color: colors.text, outlineStyle: 'none' },
   inputMultiline: { minHeight: 100, paddingTop: space(3), paddingBottom: space(3), textAlignVertical: 'top' },
   eye: { paddingHorizontal: space(3), paddingVertical: space(2) },
   inlineMsg: { flexDirection: 'row', alignItems: 'center', gap: space(1.5) },

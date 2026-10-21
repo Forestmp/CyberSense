@@ -18,9 +18,11 @@ async function authenticate(req, res, next) {
     return next(AppError.unauthorized('Token inválido o expirado'));
   }
 
-  const { rows } = await query('SELECT id, nombre, correo, rol, estado FROM usuarios WHERE id = $1', [payload.sub]);
-  const usuario = rows[0];
-  if (!usuario) return next(AppError.unauthorized('Token inválido o expirado'));
+  const { rows } = await query('SELECT id, nombre, correo, rol, estado, token_version FROM usuarios WHERE id = $1', [payload.sub]);
+  const { token_version: version, ...usuario } = rows[0] || {};
+  if (!rows[0]) return next(AppError.unauthorized('Token inválido o expirado'));
+  // Tokens anteriores a un cambio de contraseña ya no son válidos.
+  if ((payload.ver ?? 0) !== version) return next(AppError.unauthorized('Tu sesión ya no es válida. Inicia sesión de nuevo.'));
   if (usuario.estado !== 'activo') return next(AppError.forbidden('La cuenta no está activa'));
 
   req.user = usuario;

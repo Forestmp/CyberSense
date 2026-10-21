@@ -20,6 +20,7 @@ function Navegacion() {
         <Stack.Screen name="bienvenida" />
         <Stack.Screen name="login" />
         <Stack.Screen name="registro" />
+        <Stack.Screen name="recuperar" />
       </Stack.Protected>
       <Stack.Protected guard={!!usuario}>
         <Stack.Screen name="(app)" />

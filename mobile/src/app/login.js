@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { AuthLayout } from '../components/AuthLayout';
-import { Button, FormError, Input, Modal } from '../components/ui';
+import { Button, FormError, Input } from '../components/ui';
 import { useAuth } from '../context/AuthContext';
 import { colors, fonts, space, type } from '../theme';
 
@@ -13,7 +13,7 @@ export default function Login() {
   const [errores, setErrores] = useState({});
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
-  const [ayuda, setAyuda] = useState(false);
+  const router = useRouter();
   const passRef = useRef(null);
 
   async function enviar() {
@@ -74,20 +74,12 @@ export default function Login() {
         placeholder="Tu contraseña"
       />
       <View style={{ alignItems: 'flex-end', marginTop: -space(1) }}>
-        <Pressable onPress={() => setAyuda(true)} accessibilityRole="link" hitSlop={8}>
+        <Pressable onPress={() => router.push({ pathname: '/recuperar', params: correo.trim() ? { correo: correo.trim() } : {} })} accessibilityRole="link" hitSlop={8}>
           <Text style={{ color: colors.primary, fontFamily: fonts.semibold, fontSize: 14 }}>¿Olvidaste tu contraseña?</Text>
         </Pressable>
       </View>
       <Button title="Iniciar sesión" size="lg" onPress={enviar} loading={enviando} />
 
-      <Modal
-        visible={ayuda}
-        onClose={() => setAyuda(false)}
-        icon="key-outline"
-        title="Recuperar contraseña"
-        message="Por ahora la recuperación por correo no está disponible. Pide al administrador de CyberSense que restablezca tu contraseña; después podrás cambiarla desde «Mi perfil»."
-        actions={[<Button key="ok" title="Entendido" onPress={() => setAyuda(false)} />]}
-      />
     </AuthLayout>
   );
 }

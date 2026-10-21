@@ -17,6 +17,16 @@ const schema = z.object({
   // Número de proxies delante de la API (Render = 1). Necesario para que el
   // límite de intentos use la IP real del cliente.
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+  // Correo (recuperación de contraseña)
+  MAIL_PROVIDER: z.enum(['console', 'brevo']).default('console'),
+  BREVO_API_KEY: z.string().optional(),
+  MAIL_FROM_EMAIL: z.string().optional(),
+  MAIL_FROM_NAME: z.string().default('CyberSense'),
+}).superRefine((d, ctx) => {
+  if (d.MAIL_PROVIDER === 'brevo') {
+    if (!d.BREVO_API_KEY) ctx.addIssue({ code: 'custom', path: ['BREVO_API_KEY'], message: 'Obligatoria con MAIL_PROVIDER=brevo' });
+    if (!d.MAIL_FROM_EMAIL) ctx.addIssue({ code: 'custom', path: ['MAIL_FROM_EMAIL'], message: 'Obligatoria con MAIL_PROVIDER=brevo' });
+  }
 });
 
 const parsed = schema.safeParse(process.env);
