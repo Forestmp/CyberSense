@@ -98,7 +98,9 @@ En el plan gratuito, el servicio se suspende tras 15 minutos sin uso; la primera
 
 La API envía el código con **Brevo** (API HTTP; el plan gratuito de Render bloquea SMTP). En Render agrega `MAIL_PROVIDER=brevo`, `BREVO_API_KEY` y `MAIL_FROM_EMAIL` (un remitente verificado en Brevo). Sin esas variables, el código solo aparece en los logs del servidor.
 
-Para que el APK use la API publicada, compílalo con `EXPO_PUBLIC_API_URL=https://<tu-servicio>.onrender.com`.
+### Compilar el APK
+
+La app usa la URL de [mobile/.env.production](mobile/.env.production). En Windows hay que compilar desde una ruta corta y **fuera de OneDrive**; el script [mobile/scripts/build-apk.ps1](mobile/scripts/build-apk.ps1) copia el proyecto a `C:cs`, limpia compilaciones nativas anteriores, compila y deja el APK en `dist/`. El encabezado del script explica los dos problemas de Windows que evita (límite de 260 caracteres y enlaces marcados por OneDrive).
 
 ## API
 
