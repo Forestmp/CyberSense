@@ -1,0 +1,744 @@
+{
+  "descripcion": "Examen diagnóstico (RN-22, RN-25): una pregunta por subcategoría, de dificultad intermedia según la NIST Phish Scale. Todas las personas, empresas, dominios y números son ficticios. Puntuación: 1 = segura, 0.5 = mejorable, 0.25 = riesgosa, 0 = crítica.",
+  "fuentes": {
+    "condusef": {
+      "referencia": "CONDUSEF, alertas sobre mensajes de supuestos cargos no reconocidos (vía Uno TV, El Imparcial e IDC Online)",
+      "enlaces": [
+        "https://www.unotv.com/estados/ciudad-de-mexico/ojo-alertan-por-fraude-con-falso-mensaje-de-banco-asi-evitas-caer/",
+        "https://idconline.mx/corporativo/2017/07/19/nuevo-fraude-bancario-por-sms"
+      ]
+    },
+    "sat": {
+      "referencia": "SAT, alertas sobre correos y mensajes apócrifos y su buscador de correos apócrifos",
+      "enlaces": [
+        "https://www.unotv.com/negocios/sat-lanza-alerta-por-correos-falsos-y-pide-no-abrir-enlaces-sospechosos/"
+      ]
+    },
+    "ssc_cdmx": {
+      "referencia": "Policía Cibernética de la SSC-CDMX, alertas sobre ofertas de trabajo falsas y «Currículum en revisión»",
+      "enlaces": [
+        "https://www.unotv.com/ciencia-y-tecnologia/estafa-curriculum-en-revision-ssc-cdmx-alerta-por-fraude-laboral/",
+        "https://www.milenio.com/comunidad/alerta-falsas-ofertas-empleo-ssc-cdmx-como-evitarlas"
+      ]
+    },
+    "profeco": {
+      "referencia": "PROFECO, alertas sobre cobros recurrentes y correos falsos que piden pagos",
+      "enlaces": [
+        "https://www.elimparcial.com/dinero/2026/02/25/profeco-alerta-por-correos-falsos-que-piden-pagos-para-evitar-clausuras-asi-pueden-detectarse/",
+        "https://www.cronista.com/mexico/actualidad-mx/profeco-lo-deja-claro-ninguna-empresa-puede-cobrarte-de-forma-recurrente-sin-informartelo-y-si-lo-hacen-puedes-denunciarlas-paso-a-paso/"
+      ]
+    },
+    "ftc": {
+      "referencia": "FTC, «Top text scams of 2024» y alertas sobre mensajes de número equivocado",
+      "enlaces": [
+        "https://www.ftc.gov/news-events/data-visualizations/data-spotlight/2025/04/top-text-scams-2024",
+        "https://www.consumer.ftc.gov/consumer-alerts/2024/05/why-its-not-rude-ignore-hi-how-are-you-text-messages-strangers"
+      ]
+    },
+    "ic3": {
+      "referencia": "FBI IC3, PSA I-091124-PSA «Business Email Compromise: The $55 Billion Scam» (2024)",
+      "enlaces": [
+        "https://www.ic3.gov/PSA/2024/PSA240911"
+      ]
+    },
+    "cisa": {
+      "referencia": "CISA, «Avoiding Social Engineering and Phishing Attacks» y «Phishing Guidance: Stopping the Attack Cycle at Phase One» (2023)",
+      "enlaces": [
+        "https://www.cisa.gov/uscert/ncas/tips/ST04-014",
+        "https://cisa.gov/sites/default/files/2023-10/Phishing%20Guidance%20-%20Stopping%20the%20Attack%20Cycle%20at%20Phase%20One_508c.pdf"
+      ]
+    },
+    "incibe": {
+      "referencia": "INCIBE, avisos sobre citaciones falsas por correo y suplantación de familiares por mensajería",
+      "enlaces": [
+        "https://www.incibe.es/ciudadania/avisos/has-recibido-una-citacion-por-email-de-la-policia-no-descargues-el-archivo-es-un",
+        "https://www.incibe.es/ciudadania/avisos/ciberdelincuentes-se-hacen-pasar-por-familiares-para-pedir-dinero-por"
+      ]
+    },
+    "nist": {
+      "referencia": "NIST TN 2276, «NIST Phish Scale User Guide» (Dawkins y Jacobs, 2023)",
+      "enlaces": [
+        "https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2276.pdf"
+      ]
+    },
+    "apwg": {
+      "referencia": "APWG, Phishing Activity Trends Reports 2025",
+      "enlaces": [
+        "https://apwg.org/trendreports"
+      ]
+    },
+    "knowbe4": {
+      "referencia": "KnowBe4, informes trimestrales de asuntos de phishing más abiertos (2023–2025)",
+      "enlaces": [
+        "https://www.knowbe4.com/press/knowbe4-phishing-test-results-employees-most-frequently-fall-for-emails-that-look-like-they-came-from-human-resources-or-it",
+        "https://www.knowbe4.com/hubfs/Q4-2025_Phishing-Report-Infographic_EN.pdf"
+      ]
+    },
+    "documentos_nube": {
+      "referencia": "Avisos de la Universidad de Michigan y de la Universidad de St Andrews sobre notificaciones falsas de documentos compartidos",
+      "enlaces": [
+        "https://safecomputing.umich.edu/phishing-alerts/scams-utilizing-%E2%80%9Csecure%E2%80%9D-document-services-eg-docusign-2023-11-03-000000",
+        "https://itservices.wp.st-andrews.ac.uk/2026/04/06/protect-yourself-from-file-sharing-phishing-attacks/"
+      ]
+    },
+    "resultados_medicos": {
+      "referencia": "Avisos de prensa sobre correos y SMS con falsos resultados de exámenes médicos (Diario del Sur, Genbeta)",
+      "enlaces": [
+        "https://www.diariodelsur.com.co/cuidado-estan-estafando-con-falsos-resultados-de-pruebas-medicas-a-traves-del-correo-electronico/",
+        "https://www.genbeta.com/seguridad/parece-ser-medico-mala-idea-que-pinches-este-sms-cuando-recibas-no-caigas-trampa"
+      ]
+    }
+  },
+  "preguntas": [
+    {
+      "orden": 1,
+      "subcategoria": "suplantacion_empresa",
+      "enunciado": "Hace unos días compraste algo por internet y estás esperando el paquete. Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "+52 55 3871 2046",
+        "mensaje": "Envíos Tolteca: tu paquete MX48219 no pudo entregarse por dirección incompleta. Actualiza tus datos y cubre $18 de reenvío en 24 h o será devuelto: https://envios-tolteca.mx-entregas.info"
+      },
+      "opciones": [
+        {
+          "texto": "Abro el enlace, corrijo mi dirección y pago los $18 para que no se regrese el paquete.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo el SMS preguntando qué paquete es y quién lo envía.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Reviso el estado del envío con el número de guía en la tienda donde compré o en el sitio oficial de la paquetería, escribiendo yo la dirección, y reporto el SMS como spam.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Borro el mensaje y espero a ver si llega el paquete.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "El SMS viene de un número de celular, no de un remitente de la empresa.",
+        "El dominio real es mx-entregas.info, no el de la paquetería.",
+        "Pide un pago pequeño con un plazo corto para obtener los datos de la tarjeta."
+      ],
+      "fuentes": [
+        "condusef",
+        "ftc",
+        "apwg"
+      ]
+    },
+    {
+      "orden": 2,
+      "subcategoria": "suplantacion_persona_conocida",
+      "enunciado": "Te escribe por WhatsApp un número que no tienes guardado. ¿Qué haces?",
+      "contenido": {
+        "formato": "mensaje_chat",
+        "aplicacion": "WhatsApp",
+        "remitente": "+52 33 1948 7720",
+        "mensaje": "Hola, soy Mariana 🙈 se me cayó el cel al agua y este es mi número nuevo, guárdalo. Oye, ¿me puedes hacer un favor? Tengo que pagar la renta hoy y la app del banco no me abre en este cel. Te paso la cuenta y mañana te lo devuelvo sin falta. Porfa no le digas a mi mamá 🙏"
+      },
+      "opciones": [
+        {
+          "texto": "Llamo a Mariana a su número de siempre o le pregunto a alguien de su familia antes de hacer cualquier cosa.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Le transfiero; es poco dinero y me dijo que mañana me lo regresa.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Le pido por ese mismo chat que me mande un audio para confirmar que es ella.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "No respondo y bloqueo el número, sin avisarle a nadie.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "Número desconocido que dice ser alguien cercano.",
+        "Pide dinero con urgencia y una excusa para no usar su banco.",
+        "Pide discreción («no le digas a mi mamá»)."
+      ],
+      "fuentes": [
+        "incibe",
+        "ssc_cdmx"
+      ]
+    },
+    {
+      "orden": 3,
+      "subcategoria": "premio_falso",
+      "enunciado": "Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "ALBORADA",
+        "mensaje": "¡Felicidades! Tu número resultó ganador en el Sorteo Aniversario de Tiendas Alborada: pantalla de 55\". Para programar el envío cubre $149 de gastos de paquetería antes de las 20:00 en https://alborada-premios.com/reclamar Folio: AL-7731"
+      },
+      "opciones": [
+        {
+          "texto": "Pago los $149; una pantalla vale mucho más.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Abro el enlace solo para ver si el folio es válido, sin pagar todavía.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Ignoro el mensaje.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        },
+        {
+          "texto": "Recuerdo que no participé en ningún sorteo, busco por mi cuenta los canales oficiales de la tienda si quiero confirmar y reporto el SMS como spam.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        }
+      ],
+      "senales": [
+        "Un premio de un sorteo en el que no participaste.",
+        "Te piden pagar para recibir un premio.",
+        "Plazo muy corto para decidir."
+      ],
+      "fuentes": [
+        "condusef",
+        "ftc"
+      ]
+    },
+    {
+      "orden": 4,
+      "subcategoria": "multa_notificacion_gubernamental",
+      "enunciado": "Tienes un auto registrado a tu nombre. Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "+52 55 6203 9184",
+        "mensaje": "AVISO DE TRÁNSITO: registra una fotomulta pendiente asociada a sus placas. Pague hoy con 50% de descuento y evite recargos y la retención de placas: https://pagos-transito-mx.com/consulta"
+      },
+      "opciones": [
+        {
+          "texto": "Pago hoy para aprovechar el descuento.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Consulto mis multas en el portal oficial del gobierno de mi estado, escribiendo yo la dirección, y reporto el SMS.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Respondo preguntando de qué multa se trata y en qué fecha fue.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Borro el mensaje.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "No menciona tus placas ni la fecha de la infracción.",
+        "El sitio no es un dominio de gobierno (.gob.mx).",
+        "Combina un descuento con una amenaza para que pagues rápido."
+      ],
+      "fuentes": [
+        "sat",
+        "condusef"
+      ]
+    },
+    {
+      "orden": 5,
+      "subcategoria": "numero_equivocado",
+      "enunciado": "Te llega este mensaje de un número que no conoces. ¿Qué haces?",
+      "contenido": {
+        "formato": "mensaje_chat",
+        "aplicacion": "WhatsApp",
+        "remitente": "+52 81 2290 5513",
+        "mensaje": "Hola Sofía!! Ya llegué a Monterrey 😊 ¿sigue en pie la comida del jueves? Te llevo los papeles de la inversión que te conté, este mes me dio 18% 🚀"
+      },
+      "opciones": [
+        {
+          "texto": "Le contesto amablemente que se equivocó de número y sigo platicando si me responde.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Le digo que se equivocó, pero le pregunto por la inversión; un 18 % al mes suena bien.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo solo «número equivocado» y ya no contesto más.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        },
+        {
+          "texto": "No respondo, bloqueo el número y lo reporto como spam.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        }
+      ],
+      "senales": [
+        "Mensaje de un desconocido dirigido a otra persona.",
+        "Menciona una inversión con ganancias poco realistas.",
+        "Responder, aunque sea para aclarar el error, confirma que tu número está activo."
+      ],
+      "fuentes": [
+        "ftc"
+      ]
+    },
+    {
+      "orden": 6,
+      "subcategoria": "oferta_trabajo",
+      "enunciado": "Estás buscando trabajo y subiste tu currículum a una bolsa de empleo. Te llega este mensaje. ¿Qué haces?",
+      "contenido": {
+        "formato": "mensaje_chat",
+        "aplicacion": "WhatsApp",
+        "remitente": "Grupo Vértice Talento",
+        "mensaje": "Hola, tu currículum fue preseleccionado ✅ Tenemos una vacante de medio tiempo desde casa: calificar productos en línea, pago de $2,800 diarios. Para darte de alta envía foto de tu INE por ambos lados y realiza el pago de registro de $350. Cupo limitado, solo hoy."
+      },
+      "opciones": [
+        {
+          "texto": "Envío mi INE y pago el registro para no perder el lugar.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "No envío nada; una empresa real no cobra por contratarte ni pide tu identificación por chat. Bloqueo y reporto el número.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Les pido por el mismo chat más detalles de la empresa y del trabajo.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Dejo el mensaje sin responder.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "Sueldo muy alto por un trabajo sencillo.",
+        "Te cobran para darte de alta.",
+        "Piden una identificación oficial por chat.",
+        "Presión para decidir «solo hoy»."
+      ],
+      "fuentes": [
+        "ssc_cdmx",
+        "ftc"
+      ]
+    },
+    {
+      "orden": 7,
+      "subcategoria": "cargo_tienda_erroneo",
+      "enunciado": "No has comprado nada en línea esta semana. Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "+52 55 4419 0327",
+        "mensaje": "Mercantia: se registró un cargo de $8,499.00 MXN por Laptop 15\" con tu tarjeta terminación ****. Si NO reconoces esta compra responde NO y te enviaremos el enlace para tu reembolso."
+      },
+      "opciones": [
+        {
+          "texto": "Reviso mis movimientos en la app oficial de mi banco y, si hay un cargo que no reconozco, lo reporto al banco por sus canales oficiales.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Respondo NO y sigo el enlace de reembolso que me envíen.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo preguntando de qué tienda es exactamente el cargo.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Lo ignoro porque yo no compré nada.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "No muestra ningún dato real de tu tarjeta.",
+        "Busca que respondas para seguir el engaño por ese canal.",
+        "La cantidad alta busca asustarte para que actúes rápido."
+      ],
+      "fuentes": [
+        "condusef",
+        "profeco"
+      ]
+    },
+    {
+      "orden": 8,
+      "subcategoria": "resultados_laboratorio_falsos",
+      "enunciado": "La semana pasada te hiciste unos análisis de sangre en el Laboratorio Clínico Hidalgo-Arce. Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "LABHIDARCE",
+        "mensaje": "Laboratorio Clínico Hidalgo-Arce: sus resultados presentan valores fuera de rango que requieren atención. Consúltelos de inmediato ingresando su CURP y fecha de nacimiento en https://hidalgo-arce-resultados.net"
+      },
+      "opciones": [
+        {
+          "texto": "Entro al enlace y escribo mi CURP para ver los resultados cuanto antes.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo el SMS preguntando cuál estudio salió mal.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Espero a recoger los resultados en persona sin hacer nada más.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        },
+        {
+          "texto": "Consulto los resultados con el folio de mi recibo en el sitio o el teléfono oficial del laboratorio donde me los hice, y reporto el SMS.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        }
+      ],
+      "senales": [
+        "Usa el miedo por tu salud para que actúes sin pensar.",
+        "Pide datos personales (CURP y fecha de nacimiento) en un enlace.",
+        "Te pide entrar desde un enlace en lugar del portal o el folio que te dio el laboratorio."
+      ],
+      "fuentes": [
+        "resultados_medicos",
+        "incibe"
+      ]
+    },
+    {
+      "orden": 9,
+      "subcategoria": "agotamiento_servicios",
+      "enunciado": "Tu plan de celular es de prepago. Te llega este SMS. ¿Qué haces?",
+      "contenido": {
+        "formato": "sms",
+        "remitente": "+52 55 7012 3398",
+        "mensaje": "Telcora: tu plan venció y tu línea será suspendida hoy a las 23:59. Recarga $200 y recibe el DOBLE de datos solo por hoy: https://telcora-recargas.top"
+      },
+      "opciones": [
+        {
+          "texto": "Recargo en ese enlace para aprovechar el doble de datos.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Abro el enlace para ver la promoción antes de decidir.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Reviso mi saldo y vigencia en la app oficial de mi compañía y, si necesito, recargo ahí o en una tienda.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "No hago caso y espero a ver si me suspenden la línea.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "Llega de un número de celular, no del remitente de la compañía.",
+        "Amenaza con suspender el servicio el mismo día.",
+        "Dominio .top que no es el de la compañía."
+      ],
+      "fuentes": [
+        "profeco",
+        "apwg"
+      ]
+    },
+    {
+      "orden": 10,
+      "subcategoria": "alertas_seguridad_ti",
+      "enunciado": "Trabajas en Grupo Arvento, cuyo dominio de correo es grupoarvento.com.mx. Recibes este correo. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Soporte TI Grupo Arvento",
+        "remitente_correo": "soporte@grupoarvento-it.com",
+        "asunto": "Inicio de sesión inusual detectado en tu cuenta",
+        "fecha": "Hoy, 8:47",
+        "cuerpo": "Hola:\n\nDetectamos un inicio de sesión en tu cuenta de correo desde un dispositivo no reconocido (Lagos, Nigeria).\n\nSi no fuiste tú, verifica tu cuenta en los próximos 30 minutos. De lo contrario, el acceso se bloqueará por seguridad.\n\nMesa de Ayuda TI",
+        "enlace_texto": "Verificar mi cuenta",
+        "enlace_url": "https://grupoarvento-it.com/verificacion"
+      },
+      "opciones": [
+        {
+          "texto": "Entro con mi usuario y contraseña para verificar la cuenta antes de que la bloqueen.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo el correo preguntando a Soporte si el aviso es real.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Borro el correo.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        },
+        {
+          "texto": "No uso el enlace; lo reporto como phishing y, si me preocupa, contacto a la mesa de ayuda por el canal interno que ya conozco.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        }
+      ],
+      "senales": [
+        "El dominio del remitente (grupoarvento-it.com) no es el de la empresa (grupoarvento.com.mx).",
+        "Plazo de 30 minutos y amenaza de bloqueo.",
+        "Pide tu contraseña en un enlace."
+      ],
+      "fuentes": [
+        "cisa",
+        "knowbe4",
+        "nist"
+      ]
+    },
+    {
+      "orden": 11,
+      "subcategoria": "colaboracion_nube",
+      "enunciado": "Trabajas en Grupo Arvento y Laura Méndez es tu compañera de Finanzas. Recibes este correo. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Laura Méndez (vía NubeDocs)",
+        "remitente_correo": "notificaciones@nubedocs-share.com",
+        "asunto": "Laura Méndez compartió «Nómina_Q3_ajustes.xlsx» contigo",
+        "fecha": "Hoy, 11:05",
+        "cuerpo": "Laura Méndez te invitó a ver el siguiente archivo:\n\nNómina_Q3_ajustes.xlsx\n\n«Revísalo antes de las 5, por favor. Hay cambios en tu pago.»\n\nPara abrirlo, inicia sesión con tu cuenta de la empresa.",
+        "enlace_texto": "Abrir documento",
+        "enlace_url": "https://nubedocs-share.com/s/8Fq2kL"
+      },
+      "opciones": [
+        {
+          "texto": "Entro por mi cuenta al servicio de archivos de la empresa a buscar el documento compartido o le pregunto a Laura por el chat interno; si no lo compartió, reporto el correo.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Abro el documento e inicio sesión con mi cuenta de la empresa.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Abro el enlace, pero si me pide contraseña cierro la página.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Ignoro el correo.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "La notificación llega de un dominio ajeno a la empresa.",
+        "Pide iniciar sesión para ver un archivo.",
+        "El tema (cambios en tu pago) busca despertar curiosidad y prisa."
+      ],
+      "fuentes": [
+        "documentos_nube",
+        "ic3",
+        "cisa"
+      ]
+    },
+    {
+      "orden": 12,
+      "subcategoria": "cobros_cancelacion",
+      "enunciado": "Hace tiempo probaste una plataforma de películas, pero ya no la usas. Recibes este correo. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Cinéfila+",
+        "remitente_correo": "facturacion@cinefila-plus-pagos.com",
+        "asunto": "Confirmación de renovación anual: $2,399.00 MXN",
+        "fecha": "Ayer, 22:16",
+        "cuerpo": "Gracias por seguir con nosotros.\n\nTu suscripción anual Premium se renovó automáticamente por $2,399.00 MXN.\n\nSi no autorizaste esta renovación, cancélala en las próximas 24 horas para recibir el reembolso completo. Necesitarás confirmar los datos de tu tarjeta.",
+        "enlace_texto": "Cancelar y solicitar reembolso",
+        "enlace_url": "https://cinefila-plus-pagos.com/cancelar"
+      },
+      "opciones": [
+        {
+          "texto": "Entro al enlace y confirmo los datos de mi tarjeta para que me devuelvan el dinero.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Reviso los cargos en la app de mi banco y mis suscripciones entrando yo a la app o al sitio oficial de la plataforma.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Respondo el correo pidiendo que cancelen la suscripción.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "Lo borro, porque ya no uso esa plataforma.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "El dominio del remitente no es el de la plataforma.",
+        "Para «reembolsarte» piden los datos de tu tarjeta.",
+        "Plazo de 24 horas."
+      ],
+      "fuentes": [
+        "profeco",
+        "knowbe4"
+      ]
+    },
+    {
+      "orden": 13,
+      "subcategoria": "citacion_judicial",
+      "enunciado": "Recibes este correo en tu cuenta personal. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Juzgado Tercero de lo Civil",
+        "remitente_correo": "notificaciones@juzgado-civil-notifica.com",
+        "asunto": "Notificación electrónica – Expediente 4471/2026",
+        "fecha": "Hoy, 7:58",
+        "cuerpo": "Se le notifica que existe un procedimiento en su contra por adeudo. Descargue el expediente adjunto para conocer la fecha de su audiencia.\n\nDe no comparecer, se procederá conforme a derecho y podrá dictarse orden de embargo.\n\nAdjunto: Expediente_4471-2026.zip",
+        "enlace_texto": "Descargar expediente",
+        "enlace_url": "https://juzgado-civil-notifica.com/expediente/4471"
+      },
+      "opciones": [
+        {
+          "texto": "Descargo el expediente para saber de qué se trata.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Respondo el correo pidiendo más información sobre el adeudo.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "No abro el adjunto; si tengo dudas, consulto en el sitio oficial del poder judicial de mi estado, escribiendo yo la dirección, y reporto el correo.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Borro el correo.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "Un juzgado no notifica por correo desde un dominio comercial.",
+        "Saludo genérico, sin tu nombre.",
+        "Adjunto comprimido (.zip) y amenaza de embargo."
+      ],
+      "fuentes": [
+        "incibe",
+        "sat"
+      ]
+    },
+    {
+      "orden": 14,
+      "subcategoria": "formularios_rh_credenciales",
+      "enunciado": "Trabajas en Grupo Arvento (dominio grupoarvento.com.mx). Recibes este correo. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Recursos Humanos Grupo Arvento",
+        "remitente_correo": "rh@grupoarvento.com.mx",
+        "asunto": "Encuesta de clima laboral 2026 – vales de $500 por participar",
+        "fecha": "Hoy, 10:20",
+        "cuerpo": "Estimado colaborador:\n\nTe invitamos a responder la Encuesta de Clima Laboral 2026 antes del viernes. Al terminarla recibirás $500 en vales de despensa.\n\nPara validar tu participación, inicia sesión con tu usuario y contraseña de la empresa.\n\nRecursos Humanos",
+        "enlace_texto": "Responder encuesta",
+        "enlace_url": "https://grupoarvento-rh.encuestas-forms.com/clima2026"
+      },
+      "opciones": [
+        {
+          "texto": "Reviso a dónde lleva el enlace antes de abrirlo; como no es un sitio de la empresa, confirmo con RH por el canal interno y reporto el correo a TI.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "Inicio sesión y respondo la encuesta para ganarme los vales.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Reenvío el correo a mis compañeros para preguntarles si ya la respondieron.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "No la respondo y dejo el correo en la bandeja.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "El remitente parece legítimo, pero el enlace lleva a un dominio externo (encuestas-forms.com).",
+        "Una encuesta no necesita tu contraseña.",
+        "Ofrece una recompensa con fecha límite."
+      ],
+      "fuentes": [
+        "knowbe4",
+        "cisa",
+        "nist"
+      ]
+    },
+    {
+      "orden": 15,
+      "subcategoria": "correo_corporativo_bec",
+      "enunciado": "Trabajas en el área de pagos de Grupo Arvento (dominio grupoarvento.com.mx). Recibes este correo del director general. ¿Qué haces?",
+      "contenido": {
+        "formato": "correo",
+        "remitente_nombre": "Alejandro Ibarra – Director General",
+        "remitente_correo": "a.ibarra@grupo-arvento.com.mx",
+        "asunto": "Pago urgente y confidencial",
+        "fecha": "Hoy, 13:32",
+        "cuerpo": "Hola, ¿estás en la oficina?\n\nNecesito que hoy antes de las 3 pm hagas una transferencia de $186,400 a un proveedor nuevo para cerrar una adquisición. Es confidencial, no lo comentes con nadie todavía. Estoy en junta y no puedo atender llamadas.\n\nTe paso los datos de la cuenta en cuanto me confirmes.\n\nAlejandro"
+      },
+      "opciones": [
+        {
+          "texto": "Le confirmo y hago la transferencia en cuanto me mande los datos; lo pide el director.",
+          "puntuacion": 0.0,
+          "tipo": "critica"
+        },
+        {
+          "texto": "Le respondo por correo pidiéndole que me confirme que de verdad es él.",
+          "puntuacion": 0.25,
+          "tipo": "riesgosa"
+        },
+        {
+          "texto": "No respondo; confirmo la solicitud con el director por un canal que ya conozco (en persona o a su extensión) y sigo el procedimiento de pagos de la empresa.",
+          "puntuacion": 1.0,
+          "tipo": "segura"
+        },
+        {
+          "texto": "No hago nada y espero a que me vuelva a escribir.",
+          "puntuacion": 0.5,
+          "tipo": "mejorable"
+        }
+      ],
+      "senales": [
+        "El dominio tiene un guion de más (grupo-arvento.com.mx).",
+        "Urgencia, confidencialidad y que no se pueda hablar con él.",
+        "Pago a un proveedor nuevo fuera del procedimiento."
+      ],
+      "fuentes": [
+        "ic3",
+        "nist"
+      ]
+    }
+  ]
+}

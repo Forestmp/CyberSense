@@ -1,0 +1,48 @@
+# Compila el APK de depuración de la app Flutter (app/) en los servidores de GitHub.
+# Se ejecuta al subir cambios de app/ a la rama flutter-fastapi, o a mano desde
+# la pestaña Actions («Run workflow»), donde se puede indicar la URL de la API.
+# El APK queda como artefacto descargable del run (cybersense-apk).
+name: APK de la app
+
+on:
+  push:
+    branches: [flutter-fastapi]
+    paths: ['app/**', '.github/workflows/apk.yml']
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'URL de la API (por ejemplo http://192.168.100.26:8000 para la API en tu computadora)'
+        required: true
+        default: 'http://192.168.100.26:8000'
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - run: flutter test
+
+      # Depuración: admite HTTP sin cifrar para hablar con la API local por la red Wi-Fi.
+      - run: flutter build apk --debug --dart-define=API_URL=${{ inputs.api_url || 'http://192.168.100.26:8000' }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cybersense-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14

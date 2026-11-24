@@ -10,3 +10,20 @@ dist/
 web-build/
 .DS_Store
 !mobile/.env.production
+
+# API (Python)
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# App (Flutter)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+app/build/
+app/android/.gradle/
+app/android/local.properties
+app/android/app/release/
+*.iml
+.idea/

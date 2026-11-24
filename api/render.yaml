@@ -1,0 +1,47 @@
+# Despliegue de la API de CyberSense (FastAPI) en Render (Blueprint).
+# Render > New > Blueprint > selecciona el repositorio e indica la ruta api/render.yaml.
+# La base de datos sigue en Supabase; aquí solo corre la API.
+services:
+  - type: web
+    name: cybersense-api
+    runtime: python
+    plan: free
+    region: virginia
+    rootDir: api
+    buildCommand: pip install -r requirements.txt
+    # Las migraciones son idempotentes: solo aplican las pendientes.
+    startCommand: python -m scripts.migrate && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.3
+      - key: ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DB_SSL
+        value: "true"
+      # El Session pooler de Supabase (plan gratuito) admite pocas conexiones.
+      - key: DB_POOL_MAX
+        value: "5"
+      - key: JWT_EXPIRES_HOURS
+        value: "8"
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: CORS_ORIGINS
+        value: ""
+      # Secretos: se capturan en el panel de Render, nunca en el repositorio.
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # Correo para recuperar contraseña (Brevo). Con "console" el código solo aparece en los logs.
+      - key: MAIL_PROVIDER
+        value: brevo
+      - key: MAIL_FROM_NAME
+        value: CyberSense
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM_EMAIL
+        sync: false
